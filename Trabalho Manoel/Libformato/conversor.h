@@ -23,6 +23,30 @@ typedef struct{
     
 }dadooficC;
 
+typedef struct {
+    char nome[100];
+    char cpf[15];
+    char cargo[50];
+    float salario;
+} FuncionarioC;
+
+typedef struct {
+    char placa[10];
+    char modelo[50];
+    char marca[50];
+    int anoFabricacao;
+    char chassi[25];
+    char proprietario[100];
+} VeiculoC;
+
+typedef struct {
+    char nome[50];
+    char cpfCnpj[20];
+    char endereco[100];
+    char telefone[20];
+    char email[50];
+
+} cliDadosC;
 
 void oficbin();
 void pecabin();

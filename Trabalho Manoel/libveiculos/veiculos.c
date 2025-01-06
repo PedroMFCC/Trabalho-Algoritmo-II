@@ -27,7 +27,7 @@ void regveiculotxt(Veiculo veiculo) {
     }
 
 
-    fprintf(arquivo, "%s %s %s %d %s %s\n",
+    fprintf(arquivo, "%s, %s, %s, %d, %s, %s\n",
             veiculo.placa, veiculo.modelo, veiculo.marca,
             veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
 
@@ -137,7 +137,7 @@ void editveiculotxt() {
     scanf(" %9s", placa);
 
     //Compara o valor do arquivo para edição
-    while (fscanf(arquivo, "%s %s %s %d %s %[^\n]",
+    while (fscanf(arquivo, "%9[^,], %49[^,], %49[^,], %d, %24[^,], %99[^\n]\n",
                   veiculo.placa, veiculo.modelo, veiculo.marca,
                   &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) != EOF) {
         if (strcmp(veiculo.placa, placa) == 0) {
@@ -220,7 +220,7 @@ void lerveiculotxt() {
         return;
     }
     printf("================================== Lista de Veiculos ==================================\n");
-    while (fscanf(arquivo, "%s %s %s %d %s %[^\n]",
+    while (fscanf(arquivo, "%9[^,], %49[^,], %49[^,], %d, %24[^,], %99[^\n]\n",
                   veiculo.placa, veiculo.modelo, veiculo.marca,
                   &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) != EOF) {
         printf("Placa: %s\nModelo: %s\nMarca: %s\nAno: %d\nChassi: %s\nProprietário: %s\n",

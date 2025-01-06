@@ -1,3 +1,6 @@
-Lucio,123.456.789.01,Rua Novo Horizonte,(37) 98854-7212,lucio876@ifmg.com
-Pedro,990.847.311-22,Rua Olimpo Gardeno 14,(37) 84927070,pedro653@ifmg.com
-Heitor De Souza e Silva,123.123.123-12,Rua Ponte Alta,(37) 98821-7689,heitorsilva@ifmg.com
+Pedro, 123.456.789-01, Rua 9 de Dezembro 20, (35) 4002-8922, pedroemail@gmail.com
+Lucio, 123.456.789-02, Rua Afon�o Pena 42, (41) 91122-3344, lucioemail@gmail.com
+Heitor, 123.456.789-03, Rua Major Teodoro 159, (37) 99999-9999, heitoremail@gmail.com
+Lucio, 123.456.789.01, Rua Novo Horizonte, (37) 98854-7212, lucio876@ifmg.com
+Pedro, 990.847.311-22, Rua Olimpo Gardeno 14, (37) 84927070, pedro653@ifmg.com
+Heitor De Souza e Silva, 123.123.123-12, Rua Ponte Alta, (37) 98821-7689, heitorsilva@ifmg.com

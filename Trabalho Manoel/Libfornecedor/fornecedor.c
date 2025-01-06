@@ -3,6 +3,30 @@
 #include <string.h>
 #include "fornecedor.h"
 
+
+
+void regfornBIN(Forn fornecedor) {
+    FILE *bin = fopen("arquivos/fornecedores.bin", "ab");
+    if (bin == NULL) {
+        perror("Erro ao abrir o arquivo!!");
+        return;
+    }
+    fwrite(&fornecedor, sizeof(Forn), 1, bin);
+    fclose(bin);
+}
+void regfornTXT(Forn fornecedor) {
+    FILE *txt = fopen("arquivos/fornecedores.txt", "a");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo!!\n");
+        return;
+    }
+
+    fprintf(txt, "%d,%s,%s,%s,%s,%s,%s,%s\n", fornecedor.codigo,
+            fornecedor.nomeFts, fornecedor.razSc, fornecedor.insEE, fornecedor.Cnpj, fornecedor.endCp, fornecedor.Telef, fornecedor.email);
+
+    fclose(txt);
+    printf("Fornecedor registrado com sucesso!");
+}
 void regforn() {
     Forn fornecedor;
     
@@ -51,35 +75,6 @@ void regforn() {
     fclose(formaArqv);
 }
 
-void editforn() {
-    int formaReg;
-
-    FILE *formaArqv = fopen("arquivos/formato.bin", "rb");
-    if (formaArqv == NULL) {
-        printf("Erro no formato do arquivo escolhido!");
-        return;
-    }
-    fread(&formaReg, sizeof(int), 1, formaArqv);
-
-    switch (formaReg) {
-        case 1:
-            editfornBIN();
-            break;
-        case 2:
-            editfornTXT();
-            break;
-    }
-}
-
-void regfornBIN(Forn fornecedor) {
-    FILE *bin = fopen("arquivos/fornecedores.bin", "ab");
-    if (bin == NULL) {
-        perror("Erro ao abrir o arquivo!!");
-        return;
-    }
-    fwrite(&fornecedor, sizeof(Forn), 1, bin);
-    fclose(bin);
-}
 
 void lerfornBIN() {
     Forn fornecedor;
@@ -104,7 +99,61 @@ void lerfornBIN() {
     }
     fclose(bin);
 }
-/* vai editar os fornecedores em binário e localizaa o fornecedor atraves do código*/ 
+void lerfornTXT() {
+    Forn fornecedor;
+    char linha[256];
+    
+    FILE *txt = fopen("arquivos/fornecedores.txt", "r");
+    if (txt == NULL) {
+        printf("Nenhum fornecedor registrado ainda!!\n");
+        return;
+    }
+
+    printf("================================== Lista de Fornecedores ==================================\n");
+    while (fgets(linha, sizeof(linha), txt)) {
+
+        if (sscanf(linha, "%d,%59[^,],%149[^,],%19[^,],%19[^,],%149[^,],%19[^,],%149[^\n]",
+                   &fornecedor.codigo,
+                   fornecedor.nomeFts,
+                   fornecedor.razSc,
+                   fornecedor.insEE,
+                   fornecedor.Cnpj,
+                   fornecedor.endCp,
+                   fornecedor.Telef,
+                   fornecedor.email) == 8) {
+            printf("Código do fornecedor: %d\n", fornecedor.codigo);
+            printf("Nome fantasia: %s\n", fornecedor.nomeFts);
+            printf("Razão Social: %s\n", fornecedor.razSc);
+            printf("Inscrição Estadual: %s\n", fornecedor.insEE);
+            printf("CNPJ: %s\n", fornecedor.Cnpj);
+            printf("Endereço: %s\n", fornecedor.endCp);
+            printf("Telefone: %s\n", fornecedor.Telef);
+            printf("Email: %s\n", fornecedor.email);
+            printf("--------------------------------------------------------------------------------------\n");
+        } else {
+            printf("Erro ao processar linha: %s\n", linha);
+        }
+    }
+    fclose(txt);
+}
+void lerforn() {
+    int formaReg;
+    FILE *formaArqv = fopen("arquivos/formato.bin", "rb");
+    if (formaArqv == NULL) {
+        printf("Erro ao ler o arquivo!!");
+        return;
+    }
+    fread(&formaReg, sizeof(int), 1, formaArqv);
+    if (formaReg == 1) {
+        lerfornBIN();
+    } else {
+        lerfornTXT();
+    }
+
+    fclose(formaArqv);
+}
+
+
 void editfornBIN() {
     int codigoBusca;
 
@@ -185,59 +234,6 @@ void editfornBIN() {
         printf("Fornecedor com código %d não encontrado.\n", codigoBusca);
     }
 }
-// registro dos fornecedores em texto-------------------------------------------------------------------------------------------------------------
-void regfornTXT(Forn fornecedor) {
-    FILE *txt = fopen("arquivos/fornecedores.txt", "a");
-    if (txt == NULL) {
-        printf("Erro ao abrir o arquivo!!\n");
-        return;
-    }
-
-    fprintf(txt, "%d,%s,%s,%s,%s,%s,%s,%s\n", fornecedor.codigo,
-            fornecedor.nomeFts, fornecedor.razSc, fornecedor.insEE, fornecedor.Cnpj, fornecedor.endCp, fornecedor.Telef, fornecedor.email);
-
-    fclose(txt);
-    printf("Fornecedor registrado com sucesso!");
-}
-
-void lerfornTXT() {
-    Forn fornecedor;
-    char linha[256];
-    
-    FILE *txt = fopen("arquivos/fornecedores.txt", "r");
-    if (txt == NULL) {
-        printf("Nenhum fornecedor registrado ainda!!\n");
-        return;
-    }
-
-    printf("================================== Lista de Fornecedores ==================================\n");
-    while (fgets(linha, sizeof(linha), txt)) {
-
-        if (sscanf(linha, "%d,%59[^,],%149[^,],%19[^,],%19[^,],%149[^,],%19[^,],%149[^\n]",
-                   &fornecedor.codigo,
-                   fornecedor.nomeFts,
-                   fornecedor.razSc,
-                   fornecedor.insEE,
-                   fornecedor.Cnpj,
-                   fornecedor.endCp,
-                   fornecedor.Telef,
-                   fornecedor.email) == 8) {
-            printf("Código do fornecedor: %d\n", fornecedor.codigo);
-            printf("Nome fantasia: %s\n", fornecedor.nomeFts);
-            printf("Razão Social: %s\n", fornecedor.razSc);
-            printf("Inscrição Estadual: %s\n", fornecedor.insEE);
-            printf("CNPJ: %s\n", fornecedor.Cnpj);
-            printf("Endereço: %s\n", fornecedor.endCp);
-            printf("Telefone: %s\n", fornecedor.Telef);
-            printf("Email: %s\n", fornecedor.email);
-            printf("--------------------------------------------------------------------------------------\n");
-        } else {
-            printf("Erro ao processar linha: %s\n", linha);
-        }
-    }
-    fclose(txt);
-}
-/* vai editar os fornecedores em texto e localizaa o fornecedor atraves do código*/ 
 void editfornTXT() {
     int codigoBusca;
 
@@ -337,23 +333,26 @@ void editfornTXT() {
         printf("Fornecedor com código %d não encontrado.\n", codigoBusca);
     }
 }
-/* vai escolher a forma de resgitro do fornecedorr*/
-void lerforn() {
+void editforn() {
     int formaReg;
+
     FILE *formaArqv = fopen("arquivos/formato.bin", "rb");
     if (formaArqv == NULL) {
-        printf("Erro ao ler o arquivo!!");
+        printf("Erro no formato do arquivo escolhido!");
         return;
     }
     fread(&formaReg, sizeof(int), 1, formaArqv);
-    if (formaReg == 1) {
-        lerfornBIN();
-    } else {
-        lerfornTXT();
-    }
 
-    fclose(formaArqv);
+    switch (formaReg) {
+        case 1:
+            editfornBIN();
+            break;
+        case 2:
+            editfornTXT();
+            break;
+    }
 }
+
 
 void excluirReg() {
     int formato; 

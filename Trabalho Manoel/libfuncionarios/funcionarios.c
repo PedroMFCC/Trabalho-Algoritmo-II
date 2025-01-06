@@ -160,7 +160,6 @@ void editfuncionariosTXT() {
         printf("Funcionário com CPF %s não encontrado.\n", cpf);
     }
 }
-
 //Função de edição (escolhe o formato)
 void editfuncionario() {
     int formatoReg;
@@ -203,7 +202,6 @@ void lerfuncionariosbin() {
     
     fclose(arquivo);
 }
-
 // Função para leitura de funcionários no formato texto
 void lerfuncionariosTXT() {
     Funcionario funcionario;
@@ -227,8 +225,6 @@ void lerfuncionariosTXT() {
 
     fclose(arquivo);
 }
-
-
 // Função de leitura (escolhe o formato)
 void lerfuncionario() {
     int formato;

@@ -59,6 +59,8 @@ void regservico() {
         printf("Formato desconhecido.\n");
     }
 }
+
+
 // Função para editar veículo no formato binário
 void editservicobin() {
     int codigo, encontrado = 0;
@@ -190,6 +192,8 @@ void editservico() {
 
     fclose(formatoArq);
 }
+
+
 // Função para leitura de veículos no formato binário
 void lerservicobin() {
     Servico servico;
@@ -263,6 +267,8 @@ void lerservico() {
 
     fclose(formatoArq);
 }
+
+
 //Função de exclusão, exclui em binário ou txt
 void excluirServico() {
     int codigo, encontrado = 0;

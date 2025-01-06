@@ -58,13 +58,76 @@ void pecabin(){
     remove("arquivos/peca.txt");
 }
 void funcbin(){
+    FuncionarioC funcionario;
+    FILE *txt = fopen("arquivos/funcionarios.txt", "r+");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo texto!\n");
+        return;
+    }
 
+    FILE *bin = fopen("arquivos/funcionarios.bin", "ab");
+    if(bin == NULL){
+        printf("Erro ao abrir o arquivo! regbin");
+        return;
+    }
+
+
+    while (fscanf(txt, " %99[^,], %14[^,], %49[^,], %f\n", funcionario.nome, funcionario.cpf, funcionario.cargo, &funcionario.salario)== 4) 
+    {                    
+    fwrite(&funcionario, sizeof(FuncionarioC), 1, bin);
+    }
+
+    fclose(bin);
+    fclose(txt);
+
+    remove("arquivos/funcionarios.txt");
 }
 void veicbin(){
+    VeiculoC veiculo;
+    FILE *txt = fopen("arquivos/veiculos.txt", "r+");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo texto!\n");
+        return;
+    }
 
+    FILE *bin = fopen("arquivos/veiculos.bin", "ab");
+    if(bin == NULL){
+        printf("Erro ao abrir o arquivo! regbin");
+        return;
+    }
+
+    while (fscanf(txt, "%9[^,], %49[^,], %49[^,], %d, %24[^,], %99[^\n]\n", 
+                   veiculo.placa, veiculo.modelo, veiculo.marca, &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) == 6) 
+    {
+        fwrite(&veiculo, sizeof(VeiculoC), 1, bin);
+    }
+
+    fclose(bin);
+    fclose(txt);
+
+    remove("arquivos/veiculos.txt");
 }
 void clientbin(){
+    cliDadosC cliente;
+    FILE *txt = fopen("arquivos/clientes.txt", "r+");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo texto!\n");
+        return;
+    }
+    FILE *bin = fopen("arquivos/clientes.bin", "ab");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo! regbin");
+        return;
+    }
 
+    while(fscanf(txt, "%49[^,], %19[^,], %99[^,], %19[^,], %49[^\n]\n", 
+                 cliente.nome, cliente.cpfCnpj, cliente.endereco, cliente.telefone, cliente.email) == 5) {
+        fwrite(&cliente, sizeof(cliDadosC), 1, bin);
+    }
+    fclose(bin);
+    fclose(txt);
+
+    remove("arquivos/clientes.txt");
 }
 void servicobin(){
 
@@ -135,13 +198,76 @@ void pecatxt(){
     remove("arquivos/peca.bin");
 }
 void functxt(){
+    FuncionarioC funcionario;
 
+    FILE *txt = fopen("arquivos/funcionarios.txt", "a");
+    if(txt == NULL){
+        printf("erro ao converter arquivo funcionário para txt");
+        return;
+    }
+    FILE *bin = fopen("arquivos/funcionarios.bin", "r+b");
+    if(bin == NULL){
+        printf("erro ao abrir arquivo funcionário bin");
+        return;
+    }
+
+
+    while(fread(&funcionario, sizeof(FuncionarioC), 1, bin)){
+        fprintf(txt, "%s,%s,%s,%.2f\n", funcionario.nome, funcionario.cpf, funcionario.cargo, funcionario.salario);
+    }
+
+    fclose(txt);
+    fclose(bin);
+
+    remove("arquivos/funcionarios.bin");
 }
 void veictxt(){
+    VeiculoC veiculo;
+    FILE *txt = fopen("arquivos/veiculos.txt", "a");
+    if(txt == NULL){
+        printf("erro ao abrir  arquivo! regtxt");
+        return;
+    }
+    FILE *bin = fopen("arquivos/veiculos.bin", "r+b");
+    if(bin == NULL){
+        printf("erro ao abrir  arquivo! regtxt");
+        return;
+    }
+
+    while (fread(&veiculo, sizeof(VeiculoC), 1, bin)) {
+        fprintf(txt,
+        "%s, %s, %s, %d, %s, %s\n",
+        veiculo.placa, veiculo.modelo, veiculo.marca, veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
+    }
+
+    fclose(txt);
+    fclose(bin);
+
+    remove("arquivos/veiculos.bin");
+
 
 }
 void clienttxt(){
+    cliDadosC cliente;
+    FILE *txt = fopen("arquivos/clientes.txt", "a");
+    if(txt == NULL){
+        printf("erro ao abrir  arquivo! regtxt");
+        return;
+    }
+    FILE *bin = fopen("arquivos/clientes.bin", "r+b");
+    if(bin == NULL){
+        printf("erro ao abrir  arquivo! regtxt");
+        return;
+    }
 
+    while(fread(&cliente, sizeof(cliDadosC), 1, bin)){
+        fprintf(txt, "%s, %s, %s, %s, %s\n", cliente.nome, cliente.cpfCnpj, cliente.endereco, cliente.telefone, cliente.email);
+    }
+
+    fclose(txt);
+    fclose(bin);
+
+    remove("arquivos/clientes.bin");
 }
 void servicotxt(){
 
