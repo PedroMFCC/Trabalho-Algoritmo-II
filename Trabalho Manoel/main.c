@@ -7,37 +7,49 @@
 #include "libservicos/servicos.h"
 #include "Libclientes/clientes.h"
 #include "Libfornecedor/fornecedor.h"
+#include "Libformato/conversor.h"
+
 
 
 int formaregistro(){
     int i = 0;
     int formato;
 
-    FILE *arq;
-    arq = fopen("arquivos/formato.bin","wb");
+    FILE *ler = fopen("arquivos/formato.bin", "rb");
+    fread(&formato, sizeof(int), 1, ler);
+    fclose(ler);
+
+    FILE *arq = fopen("arquivos/formato.bin","wb");
     if (arq == NULL){
         printf("Erro na abertura do arquivo!");
         return 1;
     }
     while(i != 3){
-        printf("Forma em que os arquivos serao armazenados durante o processo:\n*Tenha em mente que o formato escolhido altera o local de registro tambem*\n 1 - Binario\n 2 - Texto\nDigite sua opcao:");
+        printf("Forma em que os arquivos serao armazenados durante o processo:\n 1 - Binario\n 2 - Texto\nDigite sua opcao:");
         scanf("%d", &i);
+        if(formato == i){
+            i = 3;
+        }
+        else{
+            switch (i){
+                case 1:
+                    converteparabin();
+                    formato = 1;            
+                    i = 3;
 
-        switch (i){
-            case 1:
-                formato = 1;            
-                i = 3;
-            break;
+                break;
 
-            case 2:
-                formato = 2;      
-                i = 3;      
-            break;
+                case 2:
+                    converteparatxt();
+                    formato = 2;      
+                    i = 3;      
+                break;
 
-            default:
-                i = 0;
-                printf("Formato não identificado, favor digitar um valor válido!");
-            break;
+                default:
+                    i = 0;
+                    printf("Formato não identificado, favor digitar um valor válido!");
+                break;
+            }
         }   
     }
 
@@ -45,6 +57,27 @@ int formaregistro(){
         
     fclose(arq);
     return 0;
+}
+
+void detectaformato(){
+    FILE *arq = fopen("arquivos/formato.bin", "rb");
+    int formato;
+    fread(&formato, sizeof(int), 1, arq);
+    if (arq == NULL){
+        printf("Erro ao abrir o arquivo de formato. Configure o formato primeiro.\n");
+        formaregistro();
+        return;
+    }
+    if(formato != 1 && formato != 2){
+        printf("Formato não identificado, favor configurar o formato de registro!\n");
+        formaregistro();
+    }
+    else if(formato == 1){
+        printf("Formato de registro: Binario\n");
+    }
+    else if(formato == 2){
+        printf("Formato de registro: Texto\n");
+    }
 }
 
 void menupecas(){
@@ -85,11 +118,11 @@ void menupecas(){
 
 void menuoficina(){
     int i = 0;
-    while(i != 3){
+    while(i != 5){
     i = 0;
 
     printf("\n====================================== MENU OFICINA ======================================\n");
-    printf("opcoes:\n 1 - Registrar/editar oficina\n 2 - Consultar o arquivo da oficina\n 3 - Cancelar\n digite a opção:");
+    printf("opcoes:\n 1 - Registrar oficina\n 2 - Consultar o arquivo da oficina\n 3 - Editar arquivo da oficina\n 4 - Excluir arquivo da oficina\n 5 - Cancelar\n digite a opção:");
     scanf("%d", &i);
 
     
@@ -103,6 +136,14 @@ void menuoficina(){
             break;
 
             case 3:
+                editofic();
+            break;
+
+            case 4:
+                removerofic();
+            break;
+
+            case 5:
                 printf("\n\noperação cancelada!");
                 return;
             break;
@@ -369,7 +410,7 @@ void menuprincipal(){
 //------------------------
 int main(){
 
-    formaregistro();
+    detectaformato();
     menuprincipal();
     
     return 0;

@@ -4,7 +4,7 @@
 typedef struct{
     char nomeofic[40];
     char cnpjofic[20];
-    char ruaofic[100];
+    char ruaofic[50];
     char telefofic[22];
     char emailofic[40];
     float lucro;
@@ -19,5 +19,12 @@ void regoficina();
 void leroficbin();
 void lerofictxt();
 void lerofic();
+
+void editofic();
+
+
+void removeroficbin();
+void removerofictxt();
+void removerofic();
 
 #endif

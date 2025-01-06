@@ -3,10 +3,22 @@
 #include <stdlib.h>
 #include "oficina.h"
 
+int confereofic(){
+    FILE *bin = fopen("arquivos/oficina.bin", "rb");
+    FILE *txt = fopen("arquivos/oficina.txt", "r");
+    if (bin != NULL || txt != NULL){
+        printf("Já existe um registro de oficina!\n");
+        fclose(bin);
+        fclose(txt);
+        return 1;
+    }
+    fclose(bin);
+    fclose(txt);
+}
 //Função de registro da oficina em binário
 void regoficinabin(dadooficina oficina){
     //Abre o arquivo referente
-    FILE *bin = fopen("arquivos/oficina.bin", "wb");
+    FILE *bin = fopen("arquivos/oficina.bin", "ab");
     if(bin == NULL){
         printf("Erro ao abrir o arquivo!");
         return;
@@ -18,7 +30,7 @@ void regoficinabin(dadooficina oficina){
 }
 //Função de registro da oficina em texto
 void regoficinatxt(dadooficina oficina){
-    FILE *txt = fopen("arquivos/oficina.txt", "w");
+    FILE *txt = fopen("arquivos/oficina.txt", "a");
     if(txt == NULL){
         printf("erro ao abrir  arquivo!");
         return;
@@ -63,6 +75,12 @@ void regoficinapath(dadooficina oficina){
 }
 //Função para receber o valor das variáveis
 void regoficina(){
+
+    if (confereofic() == 1){
+        return;
+    }
+    
+
     dadooficina oficina;
 
     printf("\nInsira o nome da oficina: ");
@@ -72,7 +90,7 @@ void regoficina(){
     scanf(" %19[^\n]", oficina.cnpjofic);
     getchar();
     printf("Insira o endereço da oficina: ");
-    scanf(" %99[^\n]", oficina.ruaofic);
+    scanf(" %49[^\n]", oficina.ruaofic);
     getchar();
     printf("Insira o telefone da oficina: ");
     scanf(" %21[^\n]", oficina.telefofic);
@@ -97,7 +115,7 @@ void leroficbin(){
         printf("erro lerbin");
         return;
     }
-        printf("================================= Registro da Oficina =================================\n");
+        printf("================================= Consulta da Oficina =================================\n");
     while (fread(&ofic, sizeof(dadooficina), 1, bin)) {
         printf("Nome da Oficina: %s\nCNPJ: %s\nRua da oficina: %s\nTelefome: %s\nEmail: %s\nLucro estimado: %.2f%%",
         ofic.nomeofic, ofic.cnpjofic, ofic.ruaofic, ofic.telefofic, ofic.emailofic, ofic.lucro);
@@ -114,9 +132,9 @@ void lerofictxt(){
         return;
     } 
 
-    while (fscanf(txt, "%39[^\n]\n%19[^\n]\n%99[^\n]\n%21[^\n]\n%39[^\n]\n%f\n", 
+    while (fscanf(txt, "%39[^\n]\n%19[^\n]\n%49[^\n]\n%21[^\n]\n%39[^\n]\n%f\n", 
     ofic.nomeofic, ofic.cnpjofic, ofic.ruaofic, ofic.telefofic, ofic.emailofic, &ofic.lucro) == 6) {
-        printf("================================== Registro da Oficina ==================================\n");
+        printf("================================== Consulta da Oficina ==================================\n");
         printf("Nome da Oficina: %s\n", ofic.nomeofic);
         printf("CNPJ: %s\n", ofic.cnpjofic);
         printf("Rua da Oficina: %s\n", ofic.ruaofic);
@@ -146,3 +164,76 @@ void lerofic(){
 
     fclose(formatoArq);
 }
+
+
+
+void editofic(){
+    remove("arquivos/oficina.bin");
+    remove("arquivos/oficina.txt");
+
+    dadooficina oficina;
+
+    printf("\nInsira o nome da oficina: ");
+    scanf(" %39[^\n]", oficina.nomeofic);
+    getchar();
+    printf("Insira o CNPJ da oficina: ");
+    scanf(" %19[^\n]", oficina.cnpjofic);
+    getchar();
+    printf("Insira o endereço da oficina: ");
+    scanf(" %49[^\n]", oficina.ruaofic);
+    getchar();
+    printf("Insira o telefone da oficina: ");
+    scanf(" %21[^\n]", oficina.telefofic);
+    getchar();
+    printf("Insira o e-mail da oficina: ");
+    scanf(" %39[^\n]", oficina.emailofic);
+    getchar();
+    printf("Insira a porcentagem almejada de lucro em valor inteiro (%%): ");
+    scanf("%f", &oficina.lucro);
+    getchar();
+
+    int formatoReg;
+    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    if (formatoArq == NULL){
+        printf("Erro na interpretação do formato do arquivo!");
+        return;
+    }
+    fread(&formatoReg, sizeof(int), 1, formatoArq);
+    
+    if (formatoReg == 1){
+        regoficinabin(oficina);
+    }
+    else{
+        regoficinatxt(oficina);
+    }
+
+    fclose(formatoArq);
+}
+
+
+void removeroficbin(){
+    remove("arquivos/oficina.bin");
+    printf("Arquivo da oficina removido com sucesso!\n");
+}
+void removerofictxt(){
+    remove("arquivos/oficina.txt");
+    printf("Arquivo da oficina removido com sucesso!\n");
+}
+void removerofic(){
+    int formatoReg;
+    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    if (formatoArq == NULL){
+        printf("Erro na interpretação do formato do arquivo!");
+        return;
+    }
+    fread(&formatoReg, sizeof(int), 1, formatoArq);
+    
+    if (formatoReg == 1){
+        removeroficbin();
+    }
+    else{
+        removerofictxt();
+    }
+
+    fclose(formatoArq);
+}   
