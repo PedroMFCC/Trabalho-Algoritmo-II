@@ -13,7 +13,7 @@ typedef struct {
     int codigo;
     char nomeCliente[100];
     float valor;
-    int tipoPagamento; // 1: Dinheiro/Débito, 2: Conta Paga, 3: Cartão de Crédito
+    int tipoPagamento; // 1: Dinheiro/Débito, 2: Conta Paga, 3: conta paga pela oficina 4:cartao de crédito.
     time_t dataPagamento;
 } Caixa;
 
