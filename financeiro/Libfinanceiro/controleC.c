@@ -147,63 +147,6 @@ void registrarPagamentoCartaoCredito(int codigo, float valor) {
 }
 
 
-// Função para consultar o saldo do caixa no formato binário
-void consultarSaldoCaixaBin() {
-    FILE *caixaBin = fopen("arquivos/caixa.bin", "rb");
-    if (caixaBin == NULL) {
-        printf("Erro ao abrir o arquivo binário de caixa!\n");
-        return;
-    }
-
-    Caixa lancamento;
-    float saldo = 0.0f;
-    while (fread(&lancamento, sizeof(Caixa), 1, caixaBin) == 1) {
-        saldo += lancamento.valor * lancamento.tipoPagamento;
-    }
-
-    printf("Saldo do Caixa (binário): %.2f\n", saldo);
-    fclose(caixaBin);
-}
-
-// Função para consultar o saldo do caixa no formato texto
-void consultarSaldoCaixaTxt() {
-    FILE *caixaTxt = fopen("arquivos/caixa.txt", "r");
-    if (caixaTxt == NULL) {
-        printf("Erro ao abrir o arquivo texto de caixa!\n");
-        return;
-    }
-
-    Caixa lancamento;
-    float saldo = 0.0f;
-    while (fscanf(caixaTxt, "%d|%99[^|]|%d|%f|%ld\n",
-                  &lancamento.codigo, lancamento.nomeCliente, &lancamento.tipoPagamento,
-                  &lancamento.valor, &lancamento.dataPagamento) == 5) {
-        saldo += lancamento.valor * lancamento.tipoPagamento;
-    }
-
-    printf("Saldo do Caixa (texto): %.2f\n", saldo);
-    fclose(caixaTxt);
-}
-
-// Função para consultar o saldo do caixa (determinando o formato)
-void consultarSaldoCaixa() {
-    int formatoReg;
-    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
-    if (formatoArq == NULL) {
-        printf("Erro na interpretação do formato do arquivo!\n");
-        return;
-    }
-
-    fread(&formatoReg, sizeof(int), 1, formatoArq);
-    fclose(formatoArq);
-
-    if (formatoReg == 1) {
-        consultarSaldoCaixaBin();
-    } else {
-        consultarSaldoCaixaTxt();
-    }
-}
-
 // Função para deduzir um valor do caixa no formato binário
 void deduzirCaixaBin(int codigoConta, const char *nomeFornecedor, float valor, time_t dataPagamento) {
     FILE *caixaBin = fopen("arquivos/caixa.bin", "ab");
