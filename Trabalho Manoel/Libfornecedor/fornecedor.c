@@ -21,7 +21,7 @@ void regfornTXT(Forn fornecedor) {
         return;
     }
 
-    fprintf(txt, "%d,%s,%s,%s,%s,%s,%s,%s\n", fornecedor.codigo,
+    fprintf(txt, "%d, %s, %s, %s, %s, %s, %s, %s\n", fornecedor.codigo,
             fornecedor.nomeFts, fornecedor.razSc, fornecedor.insEE, fornecedor.Cnpj, fornecedor.endCp, fornecedor.Telef, fornecedor.email);
 
     fclose(txt);
@@ -112,7 +112,7 @@ void lerfornTXT() {
     printf("================================== Lista de Fornecedores ==================================\n");
     while (fgets(linha, sizeof(linha), txt)) {
 
-        if (sscanf(linha, "%d,%59[^,],%149[^,],%19[^,],%19[^,],%149[^,],%19[^,],%149[^\n]",
+        if (sscanf(linha, "%d, %59[^,], %149[^,], %19[^,], %19[^,], %149[^,], %19[^,], %149[^\n]",
                    &fornecedor.codigo,
                    fornecedor.nomeFts,
                    fornecedor.razSc,
@@ -259,7 +259,7 @@ void editfornTXT() {
     char linha[256];
 
     while (fgets(linha, sizeof(linha), txt)) {
-        if (sscanf(linha, "%d,%59[^,],%149[^,],%19[^,],%19[^,],%149[^,],%19[^,],%149[^\n]",
+        if (sscanf(linha, "%d, %59[^,], %149[^,], %19[^,], %19[^,], %149[^,], %19[^,], %149[^\n]",
                    &f.codigo,
                    f.nomeFts,
                    f.razSc,
@@ -302,7 +302,7 @@ void editfornTXT() {
                 f.email[strcspn(f.email, "\n")] = '\0';
 
                 // vai escrever os novos dados no arquivo temporário
-                fprintf(temp, "%d,%s,%s,%s,%s,%s,%s,%s\n",
+                fprintf(temp, "%d, %s, %s, %s, %s, %s, %s, %s\n",
                         f.codigo,
                         f.nomeFts,
                         f.razSc,

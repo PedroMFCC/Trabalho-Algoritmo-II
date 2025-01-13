@@ -80,13 +80,46 @@ void detectaformato(){
     }
 }
 
-void menupecas(){
+void detectaofic(){
+    FILE *bin = fopen("arquivos/oficina.bin", "rb");
+    FILE *txt = fopen("arquivos/oficina.txt", "r");
+    if (bin != NULL || txt != NULL){
+        printf("O registro da oficina foi encontrado!\n\n");
+        fclose(bin);
+        fclose(txt);
+        return;
+    }
+    else{
+        printf("\nNenhum registro de oficina foi encontrado!\nPorfavor registre uma oficina!\n\n");
+        regoficina();
+    }
+    fclose(bin);
+    fclose(txt);
+}
+
+void menupecas(){   
     int i = 0;
-    while(i != 5){
+
+    while(i != 6){
+    detectapeca();
+    FILE *arq = fopen("arquivos/pecanmin.bin", "rb");
+    if (arq == NULL){
+        printf("Erro ao abrir o arquivo de peças mínimas!");
+        return;
+    }
+
+    int nmin;
+    
+    fread(&nmin, sizeof(int), 1, arq);
     i = 0;
 
     printf("\n======================================== MENU PEÇAS ========================================\n");
-    printf("opcoes:\n 1 - Registrar nova peca\n 2 - Editar peca ja registrada\n 3 - Consultar o arquivo\n 4 - Remover registro\n 5 - Cancelar\n digite a opção:");
+    if(nmin < 1){
+        printf("opções:\n 1 - Registrar nova peça\n 2 - Editar peca ja registrada\n 3 - Consultar o arquivo\n 4 - Remover registro\n 5 - Manusear estoque\n 6 - Cancelar\n digite a opção:");
+    }
+    else{
+        printf("(!)* - Estoque em falta!\n\nopções:\n 1 - Registrar nova peça\n 2 - Editar peca ja registrada\n 3 - Consultar o arquivo\n 4 - Remover registro\n 5 - Manusear estoque(!)\n 6 - Cancelar\n digite a opção:");
+    }
     scanf("%d", &i);
 
     
@@ -108,6 +141,10 @@ void menupecas(){
             break;
 
             case 5:
+                gerenciarpecasmen();
+            break;
+
+            case 6:
                 printf("\n\noperacao cancelada!");
                 printf("\n================================================================================\n");
                 return;
@@ -116,13 +153,13 @@ void menupecas(){
     }
 }
 
-void menuoficina(){
+int menuoficina(){
     int i = 0;
-    while(i != 5){
+    while(i != 6){
     i = 0;
 
     printf("\n====================================== MENU OFICINA ======================================\n");
-    printf("opcoes:\n 1 - Registrar oficina\n 2 - Consultar o arquivo da oficina\n 3 - Editar arquivo da oficina\n 4 - Excluir arquivo da oficina\n 5 - Cancelar\n digite a opção:");
+    printf("opcoes:\n 1 - Registrar oficina\n 2 - Consultar o arquivo da oficina\n 3 - Editar arquivo da oficina\n 4 - Excluir os dados da oficina\n 5 - Resetar todos os dados relacionados a oficina\n 6 - Cancelar\n digite a opção:");
     scanf("%d", &i);
 
     
@@ -144,8 +181,13 @@ void menuoficina(){
             break;
 
             case 5:
+                resetofic();
+                return 9;
+            break;
+
+            case 6:
                 printf("\n\noperação cancelada!");
-                return;
+                return 0;
             break;
         }
     }
@@ -356,15 +398,31 @@ void menuprincipal(){
     int i = 0;
 
     while(i != 9){
+        detectapeca();
+        FILE *arq = fopen("arquivos/pecanmin.bin", "rb");
+        if (arq == NULL){
+           printf("Erro ao abrir o arquivo de peças mínimas!");
+           return;
+        }
+
+        int nmin;
+
+        fread(&nmin, sizeof(int), 1, arq);
+
         i = 0;
 
         printf("\n======================================== MENU ========================================\n");
-        printf("Menu de opcoes, area a ser trabalhada:\n 1 - Oficina\n 2 - Peças\n 3 - Funcionários\n 4 - Veículos\n 5 - Serviços\n 6 - Clientes\n 7 - Fornecedores\n 8 - Forma de registro\n 9 - Encerrar operacao\nDigite a opcao escolhida:");
+        if(nmin < 1){
+            printf("Menu de opcoes, area a ser trabalhada:\n 1 - Oficina\n 2 - Pecas\n 3 - Funcionários\n 4 - Veículos\n 5 - Serviços\n 6 - Clientes\n 7 - Fornecedores\n 8 - Forma de registro\n 9 - Encerrar operacao\nDigite a opcao escolhida:");
+        }
+        else{
+            printf("(!)* - Estoque em falta!\n\nMenu de opcoes, area a ser trabalhada:\n 1 - Oficina\n 2 - Pecas(!)\n 3 - Funcionários\n 4 - Veículos\n 5 - Serviços\n 6 - Clientes\n 7 - Fornecedores\n 8 - Forma de registro\n 9 - Encerrar operacao\nDigite a opcao escolhida:");
+        }
         scanf("%d", &i);
 
         switch (i){
             case 1:
-                menuoficina();
+                i = menuoficina();
             break;
 
             case 2:                
@@ -411,6 +469,7 @@ void menuprincipal(){
 int main(){
 
     detectaformato();
+    detectaofic();
     menuprincipal();
     
     return 0;

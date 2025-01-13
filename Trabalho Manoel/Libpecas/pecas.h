@@ -13,6 +13,14 @@ typedef struct{
     int minpeca;
 }dadopec;
 
+typedef struct{
+    int codpec;
+    char nomepec[20];
+    int npeca;
+    float custpeca;
+}notafisc;
+
+
 float calculo(float custo);
 
 void regpecabin(dadopec peca);
@@ -24,6 +32,17 @@ void editpecabin();
 void editpecatxt();
 void editpeca();
 
+void addpecasbin();
+void addpecastxt();
+void addpecas();
+void rempecasbin();
+void rempecastxt();
+void rempecas();
+void gerenciarpecasmen();
+
+void notafiscaltxt();
+void notafiscalbin();
+
 void lerpecabin();
 void lerpecatxt();
 void lerpeca();
@@ -31,5 +50,9 @@ void lerpeca();
 void removerpecabin();
 void removerpecatxt();
 void removerpeca();
+
+void detectapecabin();
+void detectapecatxt();
+void detectapeca(); 
 
 #endif

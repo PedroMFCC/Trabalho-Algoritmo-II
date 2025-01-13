@@ -44,7 +44,7 @@ void pecabin(){
     }
 
 
-    while (fscanf(txt, "%d\n%19[^\n]\n%59[^\n]\n%29[^\n]\n%29[^\n]\n%f\n%f\n%d\n%d\n", 
+    while (fscanf(txt, "%d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
                    &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
                    &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9) 
     {                    
@@ -130,10 +130,50 @@ void clientbin(){
     remove("arquivos/clientes.txt");
 }
 void servicobin(){
+    ServicoC servico;
+    FILE *txt = fopen("arquivos/servicos.txt", "r+");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo texto!\n");
+        return;
+    }
+    FILE *bin = fopen("arquivos/servicos.bin", "ab");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo! regbin");
+        return;
+    }
 
+    while(fscanf(txt, "%d, %99[^,], %f, %f\n", 
+                 &servico.codigo, servico.descricao, &servico.preco, &servico.comissao) == 4) {
+        fwrite(&servico, sizeof(ServicoC), 1, bin);
+    }
+
+    fclose(bin);
+    fclose(txt);
+
+    remove("arquivos/servicos.txt");
 }
 void fornecbin(){
+    FornecedorC fornecedor;
+    FILE *txt = fopen("arquivos/fornecedores.txt", "r+");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo texto!\n");
+        return;
+    }
+    FILE *bin = fopen("arquivos/fornecedores.bin", "ab");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo! regbin");
+        return;
+    }
 
+    while(fscanf(txt, "%d, %59[^,], %19[^,], %149[^,], %19[^,], %149[^,], %19[^,], %149[^\n]\n", 
+                 &fornecedor.codigo, fornecedor.nomeFts, fornecedor.Cnpj, fornecedor.razSc, fornecedor.insEE, fornecedor.endCp, fornecedor.Telef, fornecedor.email) == 8) {
+        fwrite(&fornecedor, sizeof(FornecedorC), 1, bin);
+    }
+
+    fclose(bin);
+    fclose(txt);
+
+    remove("arquivos/fornecedores.txt");
 }
 void converteparabin(){
     oficbin();
@@ -188,7 +228,7 @@ void pecatxt(){
     
     while (fread(&peca, sizeof(dadopecC), 1, bin)) {
         fprintf(txt,
-        "%d\n%s\n%s\n%s\n%s\n%f\n%f\n%d\n%d\n",
+        "%d, %s, %s, %s, %s, %f, %f, %d, %d\n",
         peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
     }
 
@@ -270,10 +310,48 @@ void clienttxt(){
     remove("arquivos/clientes.bin");
 }
 void servicotxt(){
+    ServicoC servico;
+    FILE *txt = fopen("arquivos/servicos.txt", "a");
+    if(txt == NULL){
+        printf("erro ao abrir  arquivo! regtxt");
+        return;
+    }
+    FILE *bin = fopen("arquivos/servicos.bin", "r+b");
+    if(bin == NULL){
+        printf("erro ao abrir  arquivo! regtxt");
+        return;
+    }
 
+    while(fread(&servico, sizeof(ServicoC), 1, bin)){
+        fprintf(txt, "%d, %s, %.2f, %.2f\n", servico.codigo, servico.descricao, servico.preco, servico.comissao);
+    }
+
+    fclose(txt);
+    fclose(bin);
+
+    remove("arquivos/servicos.bin");
 }
 void fornectxt(){
+    FornecedorC fornecedor;
+    FILE *txt = fopen("arquivos/fornecedores.txt", "a");
+    if(txt == NULL){
+        printf("erro ao abrir  arquivo! regtxt");
+        return;
+    }
+    FILE *bin = fopen("arquivos/fornecedores.bin", "r+b");
+    if(bin == NULL){
+        printf("erro ao abrir  arquivo! regtxt");
+        return;
+    }
 
+    while(fread(&fornecedor, sizeof(FornecedorC), 1, bin)){
+        fprintf(txt, "%d, %s, %s, %s, %s, %s, %s, %s\n", fornecedor.codigo, fornecedor.nomeFts, fornecedor.Cnpj, fornecedor.razSc, fornecedor.insEE, fornecedor.endCp, fornecedor.Telef, fornecedor.email);
+    }
+
+    fclose(txt);
+    fclose(bin);
+
+    remove("arquivos/fornecedores.bin");
 }
 void converteparatxt(){
     ofictxt();

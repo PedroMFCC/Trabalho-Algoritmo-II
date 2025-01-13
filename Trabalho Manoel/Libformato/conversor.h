@@ -48,6 +48,24 @@ typedef struct {
 
 } cliDadosC;
 
+typedef struct {
+    int codigo;
+    char descricao[100];
+    float preco;
+    float comissao;
+} ServicoC;
+typedef struct {
+    int codigo;
+    char nomeFts[60]; // Nome Fantasia
+    char Cnpj[20];
+    char razSc[150]; // Razão Social
+    char insEE[20]; // Inscrição Estadual
+    char endCp[150]; // Endereço Completo
+    char Telef[20];
+    char email[150];
+
+} FornecedorC;
+
 void oficbin();
 void pecabin();
 void funcbin();

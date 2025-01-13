@@ -155,7 +155,7 @@ void editveiculotxt() {
             scanf(" %99[^\n]", veiculo.proprietario);
         }
         // Escreve no arquivo temporário (seja o registro atualizado ou o original)
-        fprintf(temp, "%s %s %s %d %s %s\n",
+        fprintf(temp, "%s, %s, %s, %d, %s, %s\n",
                 veiculo.placa, veiculo.modelo, veiculo.marca,
                 veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
     }

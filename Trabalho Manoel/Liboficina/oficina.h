@@ -22,6 +22,7 @@ void lerofic();
 
 void editofic();
 
+void resetofic();  
 
 void removeroficbin();
 void removerofictxt();

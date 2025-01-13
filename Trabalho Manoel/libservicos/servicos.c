@@ -24,7 +24,7 @@ void regservicotxt(Servico servico) {
         return;
     }
    
-    fprintf(arquivo, "%d %s %.2f %.2f\n", servico.codigo, servico.descricao, servico.preco, servico.comissao);
+    fprintf(arquivo, "%d, %s, %.2f, %.2f\n", servico.codigo, servico.descricao, servico.preco, servico.comissao);
     
     fclose(arquivo);
     printf("Serviço registrado com sucesso em formato texto!\n");
@@ -136,7 +136,7 @@ void editservicotxt() {
 
         
         char descricao[100];
-        if (sscanf(linha, "%d %99[^0-9] %f %f", &servico.codigo, descricao, &servico.preco, &servico.comissao) == 4) {
+        if (sscanf(linha, "%d, %99[^,], %f, %f\n", &servico.codigo, descricao, &servico.preco, &servico.comissao) == 4) {
             
             for (int i = strlen(descricao) - 1; i >= 0 && descricao[i] == ' '; i--) {
                 descricao[i] = '\0';
@@ -152,7 +152,7 @@ void editservicotxt() {
                 printf("Comissão: ");
                 scanf("%f", &servico.comissao);
 
-                fprintf(temp, "%d %s %.2f %.2f\n", servico.codigo, descricao, servico.preco, servico.comissao);
+                fprintf(temp, "%d, %s, %.2f, %.2f\n", servico.codigo, descricao, servico.preco, servico.comissao);
             } else {
                 fprintf(temp, "%s\n", linha);
             }
@@ -230,7 +230,7 @@ void lerservicotxt() {
 
         
         char descricao[100];
-        if (sscanf(linha, "%d %99[^0-9] %f %f", &servico.codigo, descricao, &servico.preco, &servico.comissao) == 4) {
+        if (sscanf(linha, "%d, %99[^,], %f, %f", &servico.codigo, descricao, &servico.preco, &servico.comissao) == 4) {
             
             for (int i = strlen(descricao) - 1; i >= 0 && descricao[i] == ' '; i--) {
                 descricao[i] = '\0';

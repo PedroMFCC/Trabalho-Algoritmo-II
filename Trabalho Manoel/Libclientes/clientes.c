@@ -233,7 +233,7 @@ void editcliTXT() {
 
     while (fgets(linha, sizeof(linha), txt)) {
         
-        if (sscanf(linha, "%49[^,],%19[^,],%99[^,],%19[^,],%49[^\n]", c.nome, c.cpfCnpj, c.endereco, c.telefone, c.email) == 5) {
+        if (sscanf(linha, "%49[^,], %19[^,], %99[^,], %19[^,], %49[^\n]\n", c.nome, c.cpfCnpj, c.endereco, c.telefone, c.email) == 5) {
             if (strcmp(c.cpfCnpj, cpfCnpjBusca) == 0) {
                 encontrado = 1;
                 printf("Cliente encontrado: %s\n", c.nome);
@@ -255,7 +255,7 @@ void editcliTXT() {
                 fgets(c.email, sizeof(c.email), stdin);
                 c.email[strcspn(c.email, "\n")] = '\0';
 
-                fprintf(temp, "%s,%s,%s,%s,%s\n", c.nome, c.cpfCnpj, c.endereco, c.telefone, c.email);
+                fprintf(temp, "%s, %s, %s, %s, %s\n", c.nome, c.cpfCnpj, c.endereco, c.telefone, c.email);
             } else {
                 // vai copair os dados originais para o arquivo temporario
                 fprintf(temp, "%s", linha);

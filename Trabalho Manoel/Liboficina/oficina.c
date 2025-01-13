@@ -165,7 +165,61 @@ void lerofic(){
     fclose(formatoArq);
 }
 
+void resetofic(){
+    
+    char a;
+    int formato;
+    FILE *bin = fopen("arquivos/formato.bin", "rb");
+    if (bin == NULL){
+        printf("Erro ao abrir o arquivo de formato!");
+        return;
+    }
 
+    fread(&formato, sizeof(int), 1, bin);
+
+    fclose (bin);
+
+    printf("Deseja realmente resetar o arquivo da oficina?\nNote que isso resetará todo o sistema da oficina, como registros e configurações\nO Programa também será fechado\n(S/N): ");
+    scanf(" %c", &a);
+
+    switch (a)
+    {
+        case 'S': case 's':           
+
+            remove("arquivos/lucro.bin");
+            remove("arquivos/formato.bin");
+            if(formato == 1){
+                remove("arquivos/oficina.bin");
+                remove("arquivos/pecas.bin");
+                remove("arquivos/servicos.bin");
+                remove("arquivos/funcionarios.bin");
+                remove("arquivos/veiculos.bin");
+                remove("arquivos/clientes.bin");
+                remove("arquivos/fornecedores.bin");
+            }
+            else if(formato == 2){
+                remove("arquivos/oficina.txt");
+                remove("arquivos/pecas.txt");
+                remove("arquivos/servicos.txt");
+                remove("arquivos/funcionarios.txt");
+                remove("arquivos/veiculos.txt");
+                remove("arquivos/clientes.txt");
+                remove("arquivos/fornecedores.txt");
+            }
+            else{
+                printf("Erro ao identificar os arquivos!");
+                return;
+            }
+
+        
+            printf("Oficina resetada com sucesso!\n");
+        break;
+    
+        case 'N': case 'n':
+        return;
+        break;
+    }
+}
 
 void editofic(){
     remove("arquivos/oficina.bin");
