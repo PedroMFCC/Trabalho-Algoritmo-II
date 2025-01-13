@@ -1,0 +1,123 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Compilar pecas.o",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/Libpecas/pecas.c",
+          "-o", "${workspaceFolder}/Libpecas/pecas.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Compilar clientes.o",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/Libclientes/clientes.c",
+          "-o", "${workspaceFolder}/Libclientes/clientes.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Compilar fornecedor.o",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/Libfornecedor/fornecedor.c",
+          "-o", "${workspaceFolder}/Libfornecedor/fornecedor.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Compilar oficina.o",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/Liboficina/oficina.c",
+          "-o", "${workspaceFolder}/Liboficina/oficina.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Compilar e Linkar programa",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "${workspaceFolder}/main.c",            
+          "${workspaceFolder}/Libpecas/pecas.o",  
+          "${workspaceFolder}/Liboficina/oficina.o",
+          "${workspaceFolder}/libservicos/servicos.o", 
+          "${workspaceFolder}/libveiculos/veiculos.o",
+          "${workspaceFolder}/Libclientes/clientes.o",
+          "${workspaceFolder}/Libfornecedor/fornecedor.o", 
+		      "${workspaceFolder}/libfuncionarios/funcionarios.o",
+          "${workspaceFolder}/libformato/conversor.o",
+          "-o", "${workspaceFolder}/programa.exe"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "compilar funcionarios ",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/libfuncionarios/funcionarios.c",
+          "-o", "${workspaceFolder}/libfuncionarios/funcionarios.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Compilar veiculos",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/libveiculos/veiculos.c",
+          "-o", "${workspaceFolder}/libveiculos/veiculos.o"
+        ],
+        "problemMatcher": []
+      },
+	    {
+        "label": "Compilar servicos",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/libservicos/servicos.c",
+          "-o", "${workspaceFolder}/libservicos/servicos.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Executar",
+        "type": "shell",
+        "command":"${workspaceFolder}/programa.exe",
+        "group": {
+            "kind": "test",
+            "isDefault": true
+        },
+        "problemMatcher": [],
+        "presentation": {
+            "reveal": "silent",
+            "focus": true,
+            "panel": "new",
+        }
+      },
+      {
+        "label": "Compilar formato",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/libformato/conversor.c",
+          "-o", "${workspaceFolder}/libformato/conversor.o"
+        ],
+        "problemMatcher": []
+      },
+    ]
+  }
+  
