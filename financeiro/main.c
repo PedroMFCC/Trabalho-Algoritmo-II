@@ -339,37 +339,17 @@ void menuContasPagar() {
 
         switch (opcao) {
             case 1:
-                // Chama a função para registrar uma nova conta a pagar
                 regConta();
                 break;
             case 2:
-                // Chama a função para listar as contas a pagar
                 listarContas();
                 break;
-            case 3: {
-                // Chama a função para excluir uma conta a pagar, o usuário informará o código da conta
-                int codigo;
-                printf("Digite o código da conta a ser excluída: ");
-                if (scanf("%d", &codigo) != 1) {
-                    while (getchar() != '\n'); // Limpa o buffer
-                    printf("Entrada inválida! Tente novamente.\n");
-                    continue;
-                }
-               excluirConta(codigo);
+            case 3:
+                excluirConta(); 
                 break;
-            }
-            case 4: {
-                // Chama a função para baixar (marcar como paga) uma conta a pagar
-                int codigo;
-                printf("Digite o código da conta a ser baixada (marcada como paga): ");
-                if (scanf("%d", &codigo) != 1) {
-                    while (getchar() != '\n'); // Limpa o buffer
-                    printf("Entrada inválida! Tente novamente.\n");
-                    continue;
-                }
-                baixarConta(codigo);
+            case 4:
+                baixarConta();   
                 break;
-            }
             case 5:
                 return;  // Retorna ao menu financeiro
             default:
@@ -377,6 +357,7 @@ void menuContasPagar() {
         }
     }
 }
+
 
 void menuContasReceber() {
     int opcao;
@@ -397,45 +378,25 @@ void menuContasReceber() {
 
         switch (opcao) {
             case 1:
-                // Chama a função para registrar uma nova conta a receber
                 regContaReceber();
                 break;
             case 2:
-                // Chama a função para listar as contas a receber
                 listarContasReceber();
                 break;
-            case 3: {
-    // Chama a função para excluir uma conta a receber
-             int codigo;
-             printf("Digite o código da conta a ser excluída: ");
-            if (scanf("%d", &codigo) != 1) {
-             while (getchar() != '\n');  // Limpa o buffer
-             printf("Entrada inválida! Tente novamente.\n");
-             continue;
-    }
-            excluirContasReceber(codigo);  // Função para excluir conta
-            break;
-}
-
-            case 4: {
-                // Chama a função para baixar (marcar como recebida) uma conta a receber
-                int codigo;
-                printf("Digite o código da conta a ser baixada (marcada como recebida): ");
-                if (scanf("%d", &codigo) != 1) {
-                    while (getchar() != '\n');  // Limpa o buffer
-                    printf("Entrada inválida! Tente novamente.\n");
-                    continue;
-                }
-                baixarContaReceber(codigo);
+            case 3:
+                excluirContasReceber();
                 break;
-            }
+            case 4:
+                baixarContaReceber();
+                break;
             case 5:
-                return;  // Retorna ao menu financeiro
+                return;  
             default:
                 printf("Opção inválida! Tente novamente.\n");
         }
     }
 }
+
 void menuControleCaixa() {
     int opcao;
     
@@ -461,10 +422,7 @@ void menuControleCaixa() {
                 break;
 
             case 2: {
-                // Registrar pagamento com cartão de crédito
-                int codigo;
-                float valor;
-                registrarPagamentoCartaoCredito(codigo, valor);
+                registrarPagamentoCartaoCredito();
                 break;
             }
 
