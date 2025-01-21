@@ -26,7 +26,41 @@ void RegAgendTxt(Agendamento Agend) {
 
 
     fclose(txt);
-    printf("Agendamento registrado com sucesso!");
+    printf("Agendamento registrado com sucesso!\n");
+}
+
+int horaParaMinutos(const char *hora) {
+    int horas, minutos;
+    sscanf(hora, "%d:%d", &horas, &minutos);
+    return horas * 60 + minutos;
+}
+
+// Verifica se há conflito entre horários
+int VerificaDisponibilidade(Agendamento novoAgend, const char *arquivo) {
+    FILE *arq = fopen(arquivo, "a");
+    if (arq == NULL) {
+        printf("Erro ao abrir o arquivo de agendamentos.\n");
+        return 1; // Permitir agendamento caso o arquivo não exista
+    }
+
+    Agendamento existente;
+    while (fread(&existente, sizeof(Agendamento), 1, arq) == 1) {
+        if (strcmp(existente.funcionario, novoAgend.funcionario) == 0 &&
+            strcmp(existente.data, novoAgend.data) == 0) {
+            // Conflito na mesma data para o mesmo funcionário
+            int inicioNovo = horaParaMinutos(novoAgend.hora);
+            int fimNovo = inicioNovo + novoAgend.peso;
+            int inicioExistente = horaParaMinutos(existente.hora);
+            int fimExistente = inicioExistente + existente.peso;
+
+            if (inicioNovo < fimExistente && fimNovo > inicioExistente) {
+                fclose(arq);
+                return 0; // Conflito encontrado
+            }
+        }
+    }
+    fclose(arq);
+    return 1; // Sem conflitos
 }
 
 void RegAgend() {
@@ -46,18 +80,28 @@ void RegAgend() {
     printf("\nInsira o serviço:");
     scanf("%49[^\n]", Agend.servico);
     getchar();
+    printf("\nInsira o limite de serviço do dia (em minutos):");
+    scanf("%d", &Agend.peso);
+    getchar();
     printf("\nInsira o funcionario que irá fazer o serviço:");
     scanf("%49[^\n]", Agend.funcionario);
     getchar();
-    printf("\nInsira a data do serviço:");
+    printf("\nInsira a data do serviço (DD/MM/AAAA):");
     scanf("%10[^\n]", Agend.data);
     getchar();
-    printf("\nInsira a hora do serviço:");
+    printf("\nInsira a hora do serviço (HH:MM):");
     scanf("%5[^\n]", Agend.hora);
     getchar();
 
+    // Verifica disponibilidade
+    if (!VerificaDisponibilidade(Agend, "arquivos/agendamento.txt")) {
+        printf("Conflito de horários! Não foi possível agendar.\n");
+        return;
+    }
+
+    // Verifica o formato de registro
     int formatoReg;
-    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    FILE *formatoArq = fopen("arquivos/formato.txt", "a");
     if (formatoArq == NULL) {
         printf("Erro ao interpretar formato, padrão binário será usado.\n");
         formatoReg = 1; // Padrão binário
@@ -66,6 +110,7 @@ void RegAgend() {
         fclose(formatoArq);
     }
 
+    // Registra o agendamento no formato escolhido
     if (formatoReg == 1) {
         RegAgendBin(Agend);
     } else {
@@ -487,6 +532,489 @@ void RemoverAgend() {
         RemoverAgendBin();
     } else {
         RemoverAgendTxt();
+    }
+
+    fclose(formatoArq);
+}
+
+// Ordem de Serviços -----------------------------------------------------------
+
+void RegOSBin(OrdemServico OS) {
+    FILE *bin = fopen("arquivos/ordemservico.bin", "ab");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo binário!\n");
+        return;
+    }
+
+    fwrite(&OS, sizeof(OrdemServico), 1, bin);
+    fclose(bin);
+}
+
+void RegOSTxt(OrdemServico OS) {
+    FILE *txt = fopen("arquivos/ordemservico.txt", "a");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo texto!\n");
+        return;
+    }
+
+    fprintf(txt, "%d,%s,%s,%s,%s,%d,%d,%.2f\n", OS.codOS, OS.cliente, OS.veiculo, OS.servicos, OS.pecas, OS.numPecas, OS.qtdPecas, OS.vlrTot);
+    fclose(txt);
+}
+
+void RegOS() {
+    OrdemServico OS;
+
+    printf("\nPreencha os dados para a Ordem de Serviço:\n");
+    printf("\nCódigo da OS: ");
+    scanf("%d", &OS.codOS);
+    getchar();
+    printf("\nCliente: ");
+    scanf("%49[^\n]", OS.cliente);
+    getchar();
+    printf("\nVeículo: ");
+    scanf("%49[^\n]", OS.veiculo);
+    getchar();
+    printf("\nDescrição do serviço: ");
+    scanf("%99[^\n]", OS.servicos);
+    getchar();
+    printf("\nDescriçao das peças utilizadas: ");
+    scanf("%99[^\n]", OS.pecas);
+    getchar();
+    printf("\nNúmero de peças utilizadas: ");
+    scanf("%d", &OS.numPecas);
+    getchar();
+    printf("\nQuantidade da peça utilizada no estoque: ");
+    scanf("%d", &OS.qtdPecas);
+    getchar();
+    printf("\nValor do serviço: R$ ");
+    scanf("%f", &OS.vlrTot);
+
+    int formatoReg;
+    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    if (formatoArq == NULL) {
+        printf("Erro ao interpretar o formato. Padrão binário será usado.\n");
+        formatoReg = 1; // Padrão binário
+    } else {
+        fread(&formatoReg, sizeof(int), 1, formatoArq);
+        fclose(formatoArq);
+    }
+
+    if (formatoReg == 1) {
+        RegOSBin(OS);
+    } else {
+        RegOSTxt(OS);
+    }
+}
+
+void EditOSBin() {
+    int CodBusca;
+    printf("Digite o código da OS que deseja editar: ");
+    scanf("%d", &CodBusca);
+
+    FILE *bin = fopen("arquivos/ordemservico.bin", "rb");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo binário para leitura!\n");
+        return;
+    }
+
+    FILE *temp = fopen("arquivos/temp.bin", "wb");
+    if (temp == NULL) {
+        printf("Erro ao criar arquivo temporário!\n");
+        fclose(bin);
+        return;
+    }
+
+    OrdemServico OS;
+    int encontrado = 0;
+
+    while (fread(&OS, sizeof(OrdemServico), 1, bin)) {
+        if (OS.codOS == CodBusca) {
+            encontrado = 1;
+            printf("\nInsira os novos dados da Ordem de Serviço:\n");
+            printf("Código da OS: ");
+            scanf("%d", &OS.codOS);
+            getchar();
+            printf("Nome do Cliente: ");
+            scanf("%49[^\n]", OS.cliente);
+            getchar();
+            printf("Veículo: ");
+            scanf("%49[^\n]", OS.veiculo);
+            getchar();
+            printf("Descrição do serviço: ");
+            scanf("%99[^\n]", OS.servicos);
+            getchar();
+            printf("Descrição das peças utilizadas: ");
+            scanf("%99[^\n]", OS.pecas);
+            getchar();
+            printf("\nNúmero de peças utilizadas: ");
+            scanf("%d", &OS.numPecas);
+            getchar();
+            printf("\nValor do serviço: R$ ");
+            scanf("%f", &OS.vlrTot);
+        }
+
+        fwrite(&OS, sizeof(OrdemServico), 1, temp);
+    }
+
+    fclose(bin);
+    fclose(temp);
+
+    if (encontrado) {
+        remove("arquivos/ordemservico.bin");
+        rename("arquivos/temp.bin", "arquivos/ordemservico.bin");
+        printf("Ordem de Serviço editada com sucesso!\n");
+    } else {
+        remove("arquivos/temp.bin");
+        printf("OS com código %d não encontrada!\n", CodBusca);
+    }
+}
+
+void EditOSTxt() {
+    int CodOSBusca;
+
+    printf("Digite o código da ordem de serviço que deseja editar: ");
+    scanf("%d", &CodOSBusca);
+    getchar();
+
+    FILE *txt = fopen("arquivos/ordemservico.txt", "r");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo texto para leitura!\n");
+        return;
+    }
+
+    FILE *temp = fopen("arquivos/temp.txt", "w");
+    if (temp == NULL) {
+        printf("Erro ao criar arquivo temporário!\n");
+        fclose(txt);
+        return;
+    }
+
+    OrdemServico OS;
+    char linha[256];
+    int encontrado = 0;
+
+    while (fgets(linha, sizeof(linha), txt)) {
+        if (sscanf(linha, "%d,%49[^,],%49[^,],%49[^,],%99[^,],%99[^\n],%d,%.2f", &OS.codOS, OS.cliente, OS.veiculo, OS.servicos, OS.pecas, OS.numPecas, OS.vlrTot) == 7) {
+            if (OS.codOS == CodOSBusca) {
+                encontrado = 1;
+                printf("Ordem de Serviço encontrado para o cliente: %s\n", OS.cliente);
+                printf("Insira os novos dados da Ordem de Serviço:\n");
+
+                printf("Novo código da ordem de serviço: ");
+                scanf("%d", &OS.codOS);
+
+                printf("Novo nome do cliente: ");
+                fgets(OS.cliente, sizeof(OS.cliente), stdin);
+                OS.cliente[strcspn(OS.cliente, "\n")] = '\0';
+
+                printf("Novo veículo: ");
+                fgets(OS.veiculo, sizeof(OS.veiculo), stdin);
+                OS.veiculo[strcspn(OS.veiculo, "\n")] = '\0';
+                
+                printf("Nova descrição de serviço: ");
+                fgets(OS.servicos, sizeof(OS.servicos), stdin);
+                OS.servicos[strcspn(OS.servicos, "\n")] = '\0';
+                
+                printf("Nova descrição de peças utilizadas: ");
+                fgets(OS.pecas, sizeof(OS.pecas), stdin);
+                OS.pecas[strcspn(OS.pecas, "\n")] = '\0';
+                
+                printf("Novo número de peças utilizadas: ");
+                scanf("%d", &OS.numPecas);
+                getchar();
+                printf("Novo valor do serviço: R$ ");
+                scanf("%.2f", &OS.vlrTot);
+            
+                fprintf(temp, "%d,%s,%s,%s,%s,%d,%d,%.2f\n", OS.codOS, OS.cliente, OS.veiculo,
+                        OS.servicos, OS.pecas, OS.numPecas, OS.qtdPecas, OS.vlrTot);
+            } else {
+                
+                fprintf(temp, "%s", linha);
+            }
+        }
+    }
+
+    fclose(txt);
+    fclose(temp);
+
+    if (encontrado) {
+        remove("arquivos/ordemservico.txt");
+        if (rename("arquivos/temp.txt", "arquivos/ordemservico.txt") == 0) {
+            printf("Ordem de Serviço atualizado com sucesso!\n");
+        } else {
+            printf("Erro ao substituir o arquivo original.\n");
+        }
+    } else {
+        remove("arquivos/temp.txt");
+        printf("Ordem de serviço com código %d não encontrado.\n", CodOSBusca);
+    }
+}
+
+void EditOS() {
+    int formatoReg;
+    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    if (formatoArq == NULL) {
+        printf("Erro ao interpretar formato do arquivo!\n");
+        return;
+    }
+    fread(&formatoReg, sizeof(int), 1, formatoArq);
+    fclose(formatoArq);
+
+    if (formatoReg == 1) {
+        EditOSBin();
+    } else {
+        EditOSTxt();
+    }
+}
+
+void LerOSBin() {
+    OrdemServico OS;
+    
+    FILE *bin = fopen("arquivos/ordemservico.bin", "rb");
+    if (bin == NULL) {
+        printf("Nenhuma Ordem de Serviço registrado ainda!!\n");
+        return;
+    }
+
+    printf("================================== Lista das Ordens de Serviços ==================================\n");
+    while (fread(&OS, sizeof(OrdemServico), 1, bin)) {
+        printf("Código: %d\n", &OS.codOS);
+        printf("Cliente: %s\n", OS.cliente);
+        printf("Veículo: %s\n", OS.veiculo);
+        printf("Descrição do serviço: %s\n", OS.servicos);
+        printf("Descrição das peças utilizadas: %s\n", OS.pecas);
+        printf("Número de peças utilizadas: %d\n", &OS.numPecas);
+        printf("Quantidade da peça utilizada no estoque: %d\n", &OS.qtdPecas);
+        printf("Valor do serviço: R$%.2f\n", &OS.vlrTot);
+        printf("--------------------------------------------------------------------------------------\n");
+    }
+    fclose(bin);
+}
+
+void LerOSTxt() {
+    OrdemServico OS;
+    char Linha[256];
+    
+    FILE *txt = fopen("arquivos/ordemservico.txt", "r");
+    if (txt == NULL) {
+        printf("Nenhuma Ordem de Serviço registrada ainda!!\n");
+        return;
+    }
+
+    printf("================================== Lista das Ordens de Serviços ==================================\n");
+    while (fgets(Linha, sizeof(Linha), txt)) {
+        if (sscanf(Linha, "%d,%49[^,],%49[^,],%99[^,],%99[^,],%d,%d,%f", 
+                   &OS.codOS, 
+                   OS.cliente, 
+                   OS.veiculo, 
+                   OS.servicos, 
+                   OS.pecas, &OS.numPecas, &OS.qtdPecas, &OS.vlrTot) == 8) {
+            printf("Código: %d\n", OS.codOS);
+            printf("Cliente: %s\n", OS.cliente);
+            printf("Veículo: %s\n", OS.veiculo);
+            printf("Descrição do serviço: %s\n", OS.servicos);
+            printf("Descrição das peças utilizadas: %s\n", OS.pecas);
+            printf("Número de peças utilizadas: %d\n", OS.numPecas);
+            printf("Quantidade da peça utilizada no estoque: %d\n", OS.qtdPecas);
+            printf("Valor do serviço: R$ %.2f\n", OS.vlrTot);
+            printf("--------------------------------------------------------------------------------------\n");
+        } else {
+            printf("Erro ao processar linha: %s\n", Linha);
+        }
+    }
+    fclose(txt);
+}
+
+void LerOS(){
+    int formatoReg;
+    
+    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    if (formatoArq == NULL){
+        printf("Erro na interpretação do formato do arquivo!");
+        return;
+    }
+    fread(&formatoReg, sizeof(int), 1, formatoArq);
+
+    //separa entre os formatos definidos no arquivo de formato
+    if (formatoReg == 1){
+        LerOSBin();
+    }
+    else{
+        LerOSTxt();
+    }
+
+    fclose(formatoArq);
+}
+
+void RemoverOSTxt() {
+    int codOSBusca;
+    char confirmacao;
+    int formato;
+    int encontrado = 0;
+
+    FILE *formatoFile = fopen("arquivos/formato.bin", "rb");
+    if (formatoFile == NULL) {
+        printf("Erro ao abrir o arquivo de formato. Certifique-se de que ele existe!\n");
+        return;
+    }
+    fread(&formato, sizeof(int), 1, formatoFile);
+    fclose(formatoFile);
+
+    printf("Digite o código da Ordem de Serviço a ser excluído: ");
+    scanf("%d", &codOSBusca);
+    while (getchar() != '\n'); // Limpa o buffer do teclado
+
+    if (formato == 1) {
+       
+        FILE *arquivo = fopen("arquivos/ordemservico.bin", "rb");
+        FILE *temp = fopen("arquivos/temp.bin", "wb");
+
+        if (arquivo == NULL || temp == NULL) {
+            printf("Erro ao abrir os arquivos necessários.\n");
+            if (arquivo) fclose(arquivo);
+            if (temp) fclose(temp);
+            return;
+        }
+
+        OrdemServico OS;
+
+        while (fread(&OS, sizeof(OrdemServico), 1, arquivo)) {
+            if (OS.codOS == codOSBusca) {
+                encontrado = 1;
+                printf("Ordem de Serviço com código %d encontrado. Deseja realmente excluí-lo? (S/N): ", codOSBusca);
+                scanf(" %c", &confirmacao);
+                while (getchar() != '\n'); 
+
+                if (confirmacao == 'S' || confirmacao == 's') {
+                    printf("Ordem de Serviço excluído com sucesso!\n");
+                    continue;
+                } else {
+                    printf("Operação cancelada.\n");
+                }
+            }
+            fwrite(&OS, sizeof(OrdemServico), 1, temp);
+        }
+
+        fclose(arquivo);
+        fclose(temp);
+
+        if (encontrado) {
+            remove("arquivos/ordemservico.bin");
+            rename("arquivos/temp.bin", "arquivos/ordemservico.bin");
+        } else {
+            remove("arquivos/temp.bin");
+        }
+    } else if (formato == 2) {
+    
+        FILE *arquivo = fopen("arquivos/ordemservico.txt", "r");
+        FILE *temp = fopen("arquivos/temp.txt", "w");
+
+        if (arquivo == NULL || temp == NULL) {
+            printf("Erro ao abrir os arquivos necessários.\n");
+            if (arquivo) fclose(arquivo);
+            if (temp) fclose(temp);
+            return;
+        }
+
+        char Linha[256];
+
+        while (fgets(Linha, sizeof(Linha), arquivo)) {
+            int codOS;
+            sscanf(Linha, "%d,%*s", &codOS); // Lê apenas o código de OS
+
+            if (codOS == codOSBusca) {
+                encontrado = 1;
+                printf("Ordem de Serviço com código %d encontrado. Deseja realmente excluí-lo? (S/N): ", codOSBusca);
+                scanf(" %c", &confirmacao);
+                while (getchar() != '\n'); // Limpa o buffer do teclado
+
+                if (confirmacao == 'S' || confirmacao == 's') {
+                    printf("Ordem de Serviço excluído com sucesso!\n");
+                    continue;
+                } else {
+                    printf("Operação cancelada.\n");
+                }
+            }
+            fprintf(temp, "%s", Linha); // Reescreve a linha no arquivo temporário
+        }
+
+        fclose(arquivo);
+        fclose(temp);
+
+        if (encontrado) {
+            remove("arquivos/ordemservico.txt");
+            rename("arquivos/temp.txt", "arquivos/ordemservico.txt");
+        } else {
+            remove("arquivos/temp.txt");
+        }
+    } else {
+        printf("Formato inválido definido no arquivo de configuração.\n");
+        return;
+    }
+
+    if (!encontrado) {
+        printf("Ordem de Serviço com código %d não encontrado.\n", codOSBusca);
+    }
+}
+
+
+void RemoverOSBin() {
+    int CodBusca;
+
+    printf("Digite o código da Ordem de Serviço que deseja remover: ");
+    scanf("%d", &CodBusca);
+
+    FILE *bin = fopen("arquivos/ordemservico.bin", "rb");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo binário para leitura!\n");
+        return;
+    }
+
+    FILE *temp = fopen("arquivos/temp.bin", "wb");
+    if (temp == NULL) {
+        printf("Erro ao criar arquivo temporário!\n");
+        fclose(bin);
+        return;
+    }
+
+    OrdemServico OS;
+    int encontrado = 0;
+
+    while (fread(&OS, sizeof(OrdemServico), 1, bin)) {
+        if (OS.codOS == CodBusca) {
+            encontrado = 1;
+        } else {
+            fwrite(&OS, sizeof(OrdemServico), 1, temp);
+        }
+    }
+
+    fclose(bin);
+    fclose(temp);
+
+    if (encontrado) {
+        remove("arquivos/ordemservico.bin");
+        rename("arquivos/temp.bin", "arquivos/ordemservico.bin");
+        printf("Ordem de Serviço removido com sucesso!\n");
+    } else {
+        remove("arquivos/temp.bin"); 
+        printf("Ordem de Serviço com código %d não encontrado!\n", CodBusca);
+    }
+}
+
+void RemoverOS() {
+    int formatoReg;
+
+    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    if (formatoArq == NULL) {
+        printf("Erro na interpretação do formato do arquivo!");
+        return;
+    }
+    fread(&formatoReg, sizeof(int), 1, formatoArq);
+
+    if (formatoReg == 1) {
+        RemoverOSBin();
+    } else {
+        RemoverOSTxt();
     }
 
     fclose(formatoArq);
