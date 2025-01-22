@@ -11,6 +11,7 @@
 
 
 
+
 int formaregistro(){
     int i = 0;
     int formato;
@@ -268,21 +269,22 @@ void menuVeiculos() {
 }
 
 void menuServicos() {
-    int opcao;
-    while (1) {
+    int opcao = 0;
+    while (opcao != 9) {
+        int opcao = 0;
         printf("\n======================================== MENU DE SERVIÇOS ========================================\n");
         printf("1. Registrar Novo Serviço\n");
         printf("2. Editar Serviço Existente\n");
         printf("3. Consultar Serviços\n");
         printf("4. Excluir Serviço\n");
-        printf("5. Voltar ao Menu Principal\n");
+        printf("5. Registrar novo agendamento:\n");
+        printf("6. Editar agendamento já registrado\n");
+        printf("7. Consultar agendamento\n");
+        printf("8. Excluir agendamento\n");
+        printf("9. Voltar ao Menu Principal\n");
         printf("Escolha uma opção: ");
-        if (scanf("%d", &opcao) != 1) {
-            while (getchar() != '\n'); // Limpa o buffer
-            printf("Entrada inválida! Tente novamente.\n");
-            continue;
-        }
-
+        scanf("%d", &opcao);
+        
         switch (opcao) {
             case 1:
                 regservico();
@@ -297,6 +299,21 @@ void menuServicos() {
                 excluirServico();
                 break;
             case 5:
+                RegAgend();
+            break;
+
+            case 6:
+                EditAgend();
+            break;
+
+            case 7:
+                LerAgend();
+            break;
+
+            case 8:
+                RemoverAgend();
+            break;
+            case 9:
                 return;
             default:
                 printf("Opção inválida! Tente novamente.\n");

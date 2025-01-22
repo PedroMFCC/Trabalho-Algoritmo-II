@@ -6,6 +6,8 @@ typedef struct {
     char descricao[100];
     float preco;
     float comissao;
+    int tempo;
+    int peca;
 } Servico;
 
 void regservicobin(Servico servico);
