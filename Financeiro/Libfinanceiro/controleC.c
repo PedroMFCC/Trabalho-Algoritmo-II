@@ -199,7 +199,7 @@ void listarLancamentosCaixaBin() {
 
     Caixa lancamento;
     printf("Lançamentos de Caixa (binário):\n");
-    printf("Código | Nome do Cliente     | Forma de Pagamento       | Valor    | Data de Pagamento\n");
+    printf("Código | Em parte de:    | Forma de Pagamento       | Valor    | Data de Pagamento\n");
     printf("--------------------------------------------------------------------------------------\n");
     while (fread(&lancamento, sizeof(Caixa), 1, caixaBin) == 1) {
         const char *formaPagamento;
