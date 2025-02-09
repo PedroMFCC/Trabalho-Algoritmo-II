@@ -299,19 +299,19 @@ void menuServicos() {
                 excluirServico();
                 break;
             case 5:
-                RegAgend();
+                //RegAgend();
             break;
 
             case 6:
-                EditAgend();
+                //EditAgend();
             break;
 
             case 7:
-                LerAgend();
+                //LerAgend();
             break;
 
             case 8:
-                RemoverAgend();
+                //RemoverAgend();
             break;
             case 9:
                 return;

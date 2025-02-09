@@ -27,8 +27,8 @@ void regveiculotxt(Veiculo veiculo) {
     }
 
 
-    fprintf(arquivo, "%s, %s, %s, %d, %s, %s\n",
-            veiculo.placa, veiculo.modelo, veiculo.marca,
+    fprintf(arquivo, "%d,%s,%s,%s,%d,%s,%s\n",
+            veiculo.idveiculo, veiculo.placa, veiculo.modelo, veiculo.marca,
             veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
 
     fclose(arquivo);
@@ -46,6 +46,8 @@ void regveiculo() {
     fread(&formato, sizeof(int), 1, arq);
     fclose(arq);
 
+    printf("Digite o código do veículo: ");
+    scanf("%d", &veiculo.idveiculo);
     printf("Digite a placa do veículo: ");
     scanf(" %9s", veiculo.placa);
     printf("Digite o modelo do veículo: ");
@@ -137,12 +139,14 @@ void editveiculotxt() {
     scanf(" %9s", placa);
 
     //Compara o valor do arquivo para edição
-    while (fscanf(arquivo, "%9[^,], %49[^,], %49[^,], %d, %24[^,], %99[^\n]\n",
-                  veiculo.placa, veiculo.modelo, veiculo.marca,
-                  &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) != EOF) {
+    while (fscanf(arquivo, "%d, %9[^,], %49[^,], %49[^,], %d, %24[^,], %99[^\n]\n",
+                   &veiculo.idveiculo,veiculo.placa, veiculo.modelo, veiculo.marca,
+                  &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) == 7) {
         if (strcmp(veiculo.placa, placa) == 0) {
             encontrado = 1;
             printf("Veículo encontrado! Digite os novos dados.\n");
+            printf("ID: ");
+            scanf("%d", &veiculo.idveiculo);
             printf("Modelo: ");
             scanf(" %49[^\n]", veiculo.modelo);
             printf("Marca: ");
@@ -155,7 +159,7 @@ void editveiculotxt() {
             scanf(" %99[^\n]", veiculo.proprietario);
         }
         // Escreve no arquivo temporário (seja o registro atualizado ou o original)
-        fprintf(temp, "%s, %s, %s, %d, %s, %s\n",
+        fprintf(temp, "%d, %s, %s, %s, %d, %s, %s\n",
                 veiculo.placa, veiculo.modelo, veiculo.marca,
                 veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
     }
@@ -205,8 +209,8 @@ void lerveiculobin() {
 
     printf("================================== Lista de Veiculos ==================================\n");
     while (fread(&veiculo, sizeof(Veiculo), 1, arquivo)) {
-        printf("Placa: %s, Modelo: %s, Marca: %s, Ano: %d, Chassi: %s, Proprietário: %s\n",
-               veiculo.placa, veiculo.modelo, veiculo.marca, veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
+        printf("ID: %d, Placa: %s, Modelo: %s, Marca: %s, Ano: %d, Chassi: %s, Proprietário: %s\n",
+               veiculo.idveiculo, veiculo.placa, veiculo.modelo, veiculo.marca, veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
         printf("--------------------------------------------------------------------------------------\n");
     }
     fclose(arquivo);
@@ -220,11 +224,11 @@ void lerveiculotxt() {
         return;
     }
     printf("================================== Lista de Veiculos ==================================\n");
-    while (fscanf(arquivo, "%9[^,], %49[^,], %49[^,], %d, %24[^,], %99[^\n]\n",
-                  veiculo.placa, veiculo.modelo, veiculo.marca,
-                  &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) != EOF) {
-        printf("Placa: %s\nModelo: %s\nMarca: %s\nAno: %d\nChassi: %s\nProprietário: %s\n",
-               veiculo.placa, veiculo.modelo, veiculo.marca, veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
+    while (fscanf(arquivo, "%d, %9[^,], %49[^,], %49[^,], %d, %24[^,], %99[^\n]\n",
+                  &veiculo.idveiculo, veiculo.placa, veiculo.modelo, veiculo.marca,
+                  &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) == 7) {
+        printf("ID: %d\nPlaca: %s\nModelo: %s\nMarca: %s\nAno: %d\nChassi: %s\nProprietário: %s\n",
+               veiculo.idveiculo, veiculo.placa, veiculo.modelo, veiculo.marca, veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
         printf("--------------------------------------------------------------------------------------\n");
     }
     
@@ -319,9 +323,9 @@ void excluirVeiculo() {
 
         Veiculo veiculo;
 
-        while (fscanf(arquivo, "%9s %49[^\n] %49[^\n] %d %19[^\n] %99[^\n]", 
-                      veiculo.placa, veiculo.modelo, veiculo.marca, 
-                      &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) != EOF) {
+        while (fscanf(arquivo, "%d %9s %49[^\n] %49[^\n] %d %19[^\n] %99[^\n]", 
+                      &veiculo.idveiculo, veiculo.placa, veiculo.modelo, veiculo.marca, 
+                      &veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario) == 7) {
             if (strcmp(veiculo.placa, placa) == 0) {
                 encontrado = 1;
                 printf("Veículo com placa %s encontrado. Deseja realmente excluí-lo? (S/N): ", placa);
@@ -334,8 +338,8 @@ void excluirVeiculo() {
                     printf("Operação cancelada.\n");
                 }
             }
-            fprintf(temp, "%s %s %s %d %s %s\n", 
-                    veiculo.placa, veiculo.modelo, veiculo.marca, 
+            fprintf(temp, "%d %s %s %s %d %s %s\n", 
+                    veiculo.idveiculo, veiculo.placa, veiculo.modelo, veiculo.marca, 
                     veiculo.anoFabricacao, veiculo.chassi, veiculo.proprietario);
         }
 
@@ -351,4 +355,3 @@ void excluirVeiculo() {
         printf("Veículo com placa %s não encontrado.\n", placa);
     }
 }
-

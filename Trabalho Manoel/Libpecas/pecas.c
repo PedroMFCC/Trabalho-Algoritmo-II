@@ -3,16 +3,25 @@
 #include <string.h>
 #include "pecas.h"
 
-//Subrotina para o cálculo de preço da venda de peça
-
 
 //Subrotina para registro em binário
 void regpecabin(dadopec peca){ 
-    FILE *bin = fopen("arquivos/peca.bin", "ab");
+    FILE *bin = fopen("arquivos/peca.bin", "a+b");
     if(bin == NULL){
         printf("Erro ao abrir o arquivo! regbin");
         return;
     }
+    dadopec codigo;
+    while(fread(&codigo, sizeof(dadopec), 1, bin)){
+        if(codigo.codpec > peca.codpec){
+            peca.codpec = codigo.codpec;
+        }
+        else{
+            peca.codpec = 0;
+        }
+    }
+
+    peca.codpec += 1;
 
     fwrite(&peca, sizeof(dadopec), 1, bin);
 
@@ -20,15 +29,27 @@ void regpecabin(dadopec peca){
 }
 //Subrotina para registro em texto
 void regpecatxt(dadopec peca){
-    FILE *txt = fopen("arquivos/peca.txt", "a");
+    FILE *txt = fopen("arquivos/peca.txt", "a+");
     if(txt == NULL){
         printf("erro ao abrir  arquivo! regtxt");
         return;
     }
 
+    dadopec codigo;
+
+    while(fscanf(txt, "%d, %d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d", &codigo.codpec, &codigo.definecod, codigo.nomepec, codigo.descpec, codigo.fabpec, codigo.fornpec, &codigo.custpeca, &codigo.vendpeca, &codigo.npeca, &codigo.minpeca) == 10){
+        if(codigo.codpec > peca.codpec){
+            peca.codpec = codigo.codpec;
+        }
+    }
+
+    peca.codpec += 1;
+
+
+
     fprintf(txt,
-    "%d, %s, %s, %s, %s, %f, %f, %d, %d\n",
-    peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
+    "%d, %d, %s, %s, %s, %s, %f, %f, %d, %d\n",
+    peca.codpec, peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
 
 
     fclose(txt);
@@ -58,8 +79,9 @@ void regpecapath(dadopec peca){
 void regpeca(){
     dadopec peca;
     
-    printf("\nInsira o código da peça:");
-    scanf("%d", &peca.codpec);
+    peca.codpec = 0;
+
+    peca.definecod = 0;
     getchar();
     printf("Insira o nome da peça:");
     scanf("%19[^\n]", peca.nomepec);
@@ -87,166 +109,6 @@ void regpeca(){
     printf("\n----------------\nAcesse './pecas/manusear estoque/registrar compra' para adicionar suas pecas ao estoque\n----------------\n");
 
     regpecapath(peca);
-}
-
-
-void addpecasbin(){
-    int codBusca;
-    int npeca;
-    char o = 's';
-    int encontrado = 0;
-
-    FILE *bin = fopen("arquivos/peca.bin", "rb");
-    if (bin == NULL) {
-        printf("Erro ao abrir o arquivo para conferir dados atuais\n");
-        return;
-    }
-
-    FILE *temp = fopen("arquivos/temp.bin", "wb");
-    if (temp == NULL) {
-        printf("Erro ao carregar o arquivo de adição das peças\n");
-        fclose(bin);
-        return;
-    }
-
-    FILE *nota = fopen("arquivos/notafiscal.bin", "ab");
-    if (nota == NULL) {
-        printf("Erro ao abrir o arquivo de nota fiscal!\n");
-        return;
-    }
-
-    notafisc peca2;
-    dadopec peca;
-
-    printf("Digite o código da peça que deseja registrar a compra: ");
-    scanf("%d", &codBusca);
-
-    rewind (bin);
-    encontrado=0;
-
-    while (fread(&peca, sizeof(dadopec), 1, bin)) { 
-        if (peca.codpec == codBusca) {
-            encontrado = 1;
-            printf("Insira a quantia de peças de código %d que foram adquiridas:", peca.codpec);
-            scanf("%d", &npeca);
-            peca.npeca += npeca;
-
-            peca2.codpec = peca.codpec;
-            peca2.npeca = npeca;
-            strcpy(peca2.nomepec, peca.nomepec);
-            peca2.custpeca = peca.custpeca;+
-
-            fwrite(&peca2, sizeof(notafisc), 1, nota);
-        }
-        fwrite(&peca, sizeof(dadopec), 1, temp);
-            
-    }
-    if(encontrado == 0){
-        printf("Peça com código %d não encontrada!\n", codBusca);
-    }
-    
-    fclose(bin);
-    fclose(temp);
-    fclose(nota);
-
-    if (encontrado) {
-        remove("arquivos/peca.bin");
-        rename("arquivos/temp.bin", "arquivos/peca.bin");
-        printf("Peças adiquiridas com sucesso!\n");
-    } else {
-        remove("arquivos/temp.bin");
-    }
-
-    
-}
-void addpecastxt(){
-    int codBusca;
-    int npeca;
-    char o = 's';
-    int encontrado = 0;
-
-    FILE *txt = fopen("arquivos/peca.txt", "r");
-    if (txt == NULL) {
-        printf("Erro ao abrir o arquivo para conferir dados atuais\n");
-        return;
-    }
-
-    FILE *temp = fopen("arquivos/temp.txt", "w");
-    if (temp == NULL) {
-        printf("Erro ao carregar o arquivo de adição das peças\n");
-        fclose(txt);
-        return;
-    }
-
-    FILE *nota = fopen("arquivos/notafiscal.bin", "ab");
-    if (nota == NULL) {
-        printf("Erro ao abrir o arquivo de nota fiscal!\n");
-        return;
-    }
-
-    notafisc peca2;
-    dadopec peca;
-
-    printf("Digite o código da peça que deseja registrar a compra: ");
-    scanf("%d", &codBusca);
-
-    rewind (txt);
-    encontrado=0;
-
-    while (fscanf(txt, 
-                "%d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
-                &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-                &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9) { 
-        if (peca.codpec == codBusca) {
-            encontrado = 1;
-            printf("Insira a quantia de peças de código %d que foram adquiridas:", peca.codpec);
-            scanf("%d", &npeca);
-            peca.npeca += npeca;
-
-            peca2.codpec = peca.codpec;
-            peca2.npeca = npeca;
-            strcpy(peca2.nomepec, peca.nomepec);
-            peca2.custpeca = peca.custpeca;+
-
-            fwrite(&peca2, sizeof(notafisc), 1, nota);
-        }
-        fprintf(temp,
-            "%d, %s, %s, %s, %s, %f, %f, %d, %d\n",
-            peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-            peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
-            
-    }
-    if(encontrado == 0){
-        printf("Peça com código %d não encontrada!\n", codBusca);
-    }
-    
-    fclose(txt);
-    fclose(temp);
-    fclose(nota);
-
-    if (encontrado) {
-        remove("arquivos/peca.txt");
-        rename("arquivos/temp.txt", "arquivos/peca.txt");
-        printf("Peças adiquiridas com sucesso!\n");
-    } else {
-        remove("arquivos/temp.txt");
-    }
-}
-void addpecas(){
-    int formato;
-    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
-    if (formatoArq == NULL){
-        printf("Erro na interpretação do formato do arquivo!");
-        return;
-    }
-    fread(&formato, sizeof(int), 1, formatoArq);
-
-    if (formato == 1){
-        addpecasbin();
-    }
-    else{
-        addpecastxt();
-    }
 }
 
 void rempecasbin(){
@@ -322,8 +184,8 @@ void rempecastxt(){
 
 
     while (fscanf(txt, 
-                "%d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
-                &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                "%d, %d,%19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
+                &peca.codpec, &peca.definecod,peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
                 &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9) { 
         if (peca.codpec == codBusca) {
             encontrado = 1;
@@ -332,8 +194,8 @@ void rempecastxt(){
             peca.npeca -= npeca;
         }
         fprintf(temp,
-            "%d, %s, %s, %s, %s, %f, %f, %d, %d\n",
-            peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+            "%d, %d, %s, %s, %s, %s, %f, %f, %d, %d\n",
+            peca.codpec, peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
             peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
             
     }
@@ -382,8 +244,7 @@ void gerenciarpecasmen(){
     }
     fread(&formato, sizeof(int), 1, formatoarq);
     fclose(formatoarq);
-    while(i != 4){
-        char o = 's';
+    while(i != 5){
         detectapeca();
         FILE *arq = fopen("arquivos/pecanmin.bin", "rb");
         if (arq == NULL){
@@ -401,29 +262,17 @@ void gerenciarpecasmen(){
 
             printf("\n======================================== MENU GERENCIAR PEÇAS ========================================\n");
         if(nmin == 0){
-            printf("opcoes:\n 1 - Registrar compra de pecas ao estoque\n 2 - Registrar venda de peças do estoque\n 3 - Consultar estoque\n 4 - Cancelar\n digite a opção:");
+            printf("opcoes:\n 1 - Registrar compra de pecas ao estoque\n 2 - Registrar venda de peças do estoque\n 3 - Consultar estoque\n 4 - Restaurar peca\n 5 - Cancelar\n digite a opção:");
         }
         else{
-            printf("(!)* - Estoque em falta!\n\nopcoes:\n 1 - Adicionar peças ao estoque\n 2 - Remover peças do estoque\n 3 - Consultar estoque(!)\n 4 - Cancelar\n digite a opção:");
+            printf("(!)* - Estoque em falta!\n\nopcoes:\n 1 - Adicionar peças ao estoque\n 2 - Remover peças do estoque\n 3 - Consultar estoque(!)\n 4 - Restaurar peca\n 5 - Cancelar\n digite a opção:");
         }
             scanf("%d", &i);
 
 
         switch(i){
             case 1:
-                while(o != 'n' && o != 'N'){
-                    addpecas();
-                    printf("Deseja adicionar outras peças ao estoque?\nAs pecas adiconadas serao registradas na notafiscal desta opeeracaos\n(s/n): ");
-                    scanf(" %c", &o);
-                }
-                if(formato == 1){
-                    notafiscalbin();
-                    remove("arquivos/notafiscal.bin");
-                }
-                else if(formato == 2){
-                    notafiscaltxt();
-                    remove("arquivos/notafiscal.txt");
-                }
+                notafiscal();
             break;
 
             case 2:
@@ -435,235 +284,423 @@ void gerenciarpecasmen(){
             break;
 
             case 4:
+                restaurapeca();
+            break;
+
+            case 5:
                 printf("\n\noperação cancelada!");
                 return;
             break;
         }
     }
 }
+void reallocnotafisc(dadopec **dadonota, int *tamanho, dadopec novaPeca) {
+    *tamanho += 1;
+    *dadonota = (dadopec *)realloc(*dadonota, (*tamanho) * sizeof(dadopec));
+
+    if (*dadonota == NULL) {
+        printf("Erro ao realocar memória!\n");
+        exit(1);
+    }
+
+    (*dadonota)[(*tamanho) - 1] = novaPeca;
+}
+
 
 void notafiscalbin(){
-    char forn[50]; //provisório
-    float frete; //provisório
-    char cnpj[19]; //provisório
-    float imposto; //provisório
-    int quantsup = 0;
-    float precgeral = 0;
-    FILE* nota = fopen("arquivos/notafiscal.bin", "rb");
-    if (nota == NULL){
-        printf("Erro ao abrir o arquivo de nota fiscal!");
-        fclose(nota);
-        return;
-    }
-    FILE* notabin = fopen("arquivos/peca.bin", "rb");
-    if (notabin == NULL){
-        printf("Erro ao abrir o arquivo de peças!");
-        fclose(nota);
-        fclose(notabin);
-        return;
-    }
-    FILE* notatemp = fopen("arquivos/temp.bin", "wb");
-    if (notatemp == NULL){
-        printf("Erro ao criar o arquivo temporário!");
-        fclose(nota);
-        fclose(notabin);
-        fclose(notatemp);
-        return;
-    }
     FILE *lucroarq = fopen("arquivos/lucro.bin", "rb");
     if (lucroarq == NULL){
-        printf("Erro ao abrir o arquivo de lucro!");
-        fclose(nota);
-        fclose(notabin);
-        fclose(notatemp);
+        printf("Erro ao carregar o arquivo de lucro das peças\n");
         fclose(lucroarq);
         return;
     }
+
+    FILE *notafiscal = fopen("arquivos/notafiscal.bin", "ab");
+    if (notafiscal == NULL){
+        printf("Erro ao carregar o arquivo de notafiscal das peças\n");
+        fclose(lucroarq);
+        fclose(notafiscal);
+    }
+    int *vetnpeca = NULL;
+    int *vetcodpeca = NULL;
+    int tamanho = 0;
+
+    char o = 's';
+    int codBuscapeca;
+    while(o != 'n' && o != 'N'){
+        
+        int npeca;
+
+        FILE *bin = fopen("arquivos/peca.bin", "rb");
+        if (bin == NULL) {
+            printf("Erro ao abrir o arquivo para conferir dados atuais\n");
+            fclose(bin);
+            fclose(lucroarq);
+            fclose(notafiscal);
+            return;
+        }
+        FILE *pecaadd = fopen("arquivos/pecaadd.bin", "wb");
+        if (pecaadd == NULL) {
+            printf("Erro ao carregar o arquivo de adição das peças\n");
+            fclose(bin);
+            fclose(lucroarq);
+            fclose(notafiscal);
+            fclose(pecaadd);
+            return;
+        }       
+
+        printf("Digite o código da peça que deseja registrar a compra: ");
+        scanf("%d", &codBuscapeca);
+
+        rewind (bin);
+        dadopec peca;
+        int encontrado = 0;
+        while (fread(&peca, sizeof(dadopec), 1, bin)) { 
+            if (peca.codpec == codBuscapeca) {                
+                encontrado = 1;
+                printf("Insira a quantia de peças de código %d que foram adquiridas:", peca.codpec);
+                scanf("%d", &npeca);
+                peca.npeca += npeca;
+
+
+                tamanho++;
+                vetcodpeca = (int *)realloc(vetcodpeca, tamanho * sizeof(int));
+                vetnpeca = (int *)realloc(vetnpeca, tamanho * sizeof(int));
+
+                vetcodpeca[tamanho - 1] = codBuscapeca;
+                vetnpeca[tamanho - 1] = npeca;
+            }
+            fwrite(&peca, sizeof(dadopec), 1, pecaadd);
+                
+        }
+        if(encontrado == 0){
+            printf("Peça com código %d não encontrada!\n", codBuscapeca);
+        }
+        
+        printf("Deseja adicionar outras peças ao estoque?\nAs pecas adiconadas serao registradas na notafiscal desta opeeracaos\n(s/n): ");
+        scanf(" %c", &o);
+        
+
+        fclose(pecaadd);
+        fclose(bin);
+        if (encontrado) {
+            remove("arquivos/peca.bin");
+            rename("arquivos/pecaadd.bin", "arquivos/peca.bin");
+            printf("Peças adiquiridas com sucesso!\n");
+        } else {
+            remove("arquivos/pecaadd.bin");
+        }
+    }
+
+
+    FILE *bin = fopen("arquivos/peca.bin", "rb");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo para conferir dados atuais\n");
+        fclose(bin);
+        fclose(lucroarq);
+        fclose(notafiscal);
+        return;
+    }
+    FILE *notatemp = fopen("arquivos/novapeca.bin", "wb");
+    if(notatemp == NULL){
+        fclosefclose(bin);
+        fclose(lucroarq);
+        fclose(notafiscal);
+        return;
+    }
+
     float lucro;
     fread(&lucro, sizeof(float), 1, lucroarq);
-    fclose(lucroarq);
-    dadopec peca;
-    notafisc peca2;
+    
+    int quantsup = 0;
+    regfisc notafinal;
+    dadopec leiturai;
     
     getchar();
-    printf("Insira o nome do fornecedor: "); //provisório
-    scanf("%49[^\n]", forn); //provisório
+    printf("codigo da nota: %d");
+    scanf("%d", &notafinal.codnota);
     getchar();
-    printf("Insira o CNPJ do fornecedor: "); //provisório
-    scanf("%19[^\n]", cnpj);    //provisório
+    printf("Insira o nome do fornecedor: ");
+    scanf("%49[^\n]", notafinal.forn);
+    getchar();
+    printf("Insira o CNPJ do fornecedor: ");
+    scanf("%19[^\n]", notafinal.cnpj);
     getchar();
     printf("Insira o valor do frete: "); //provisório
-    scanf("%f", &frete);   //provisório
+    scanf("%f", &notafinal.frete);   //provisório
     printf("Insira o valor do imposto: "); //provisório
-    scanf("%f", &imposto); //provisório
+    scanf("%f", &notafinal.imposto); //provisório
     getchar();
     
 
     printf("===================================== Nota Fiscal =====================================\n");
-    printf("Fornecedor: %s\n", forn);
-    printf("CNPJ: %s\n", cnpj);
-    printf("Frete: %.2f  |", frete); printf("Imposto: %.2f\n", imposto);
+    
+    printf("Fornecedor: %s\n", notafinal.forn);
+    printf("CNPJ: %s\n", notafinal.cnpj);
+    printf("Frete: %.2f  |", notafinal.frete); printf("Imposto: %.2f\n", notafinal.imposto);
     printf("------------------------------ Produtos ------------------------------\n");
     printf("Nome da peça            | Custo unitário      | Quantidade    | Valor total\n");
-    while (fread(&peca2, sizeof(notafisc), 1, nota)) {
-        printf("Nome da peça: %s  |", peca2.nomepec);printf("Custo unitário: %.2f  |", peca2.custpeca);printf("Quantidade: %d  |", peca2.npeca);printf("Valor total: %.2f\n", peca2.custpeca * peca2.npeca);       
-        quantsup += peca2.npeca;
-        precgeral += peca2.custpeca * peca2.npeca;
+    notafinal.precgeral = 0;
+    while(fread(&leiturai, sizeof(dadopec), 1, bin)){
+        for(int i = 0; i < tamanho; i++){
+            if(vetcodpeca[i] == leiturai.codpec){
+                printf("Nome da peça: %-22s  |", leiturai.nomepec);printf("Custo unitário: %-10.2f  |", leiturai.custpeca);printf("Quantidade: %-13d  |", leiturai.npeca);printf("Valor total: %.2f\n", leiturai.custpeca * leiturai.npeca);       
+                quantsup += leiturai.npeca;
+                notafinal.precgeral += leiturai.custpeca * leiturai.npeca;
+            }   
+        }     
     }
-    precgeral += imposto + frete;
-    imposto = imposto/quantsup;
-    frete = frete/quantsup;
+    notafinal.precgeral += notafinal.imposto + notafinal.frete;
+    notafinal.imposto = notafinal.imposto/quantsup;
+    notafinal.frete = notafinal.frete/quantsup;
+    notafinal.definecod = 1;
+    fwrite(&notafinal, sizeof(regfisc), 1, notafiscal);
     printf("------------------------------\n");
-    printf("Valor total da compra: %.2f\n", precgeral);
+    printf("Valor total da compra: %.2f\n", notafinal.precgeral);
     printf("==============================\n");
-    rewind(nota);
+    rewind(bin);
     int cont = 0;
-    while(fread(&peca, sizeof(dadopec), 1, notabin)){
-        rewind (nota);
-        while(fread(&peca2, sizeof(notafisc), 1, nota)){                  
-            if(peca.codpec == peca2.codpec){
-                peca.vendpeca = peca2.custpeca + imposto + frete;
-                peca.vendpeca = peca.vendpeca + (peca.vendpeca * (lucro/100));
+    while(fread(&leiturai, sizeof(dadopec), 1, bin)){   
+        for(int i = 0; i < tamanho; i++){
+            if(leiturai.codpec == vetcodpeca[i]){
+                leiturai.vendpeca = leiturai.custpeca + notafinal.imposto + notafinal.frete;
+                leiturai.vendpeca = leiturai.vendpeca + (leiturai.vendpeca * (lucro/100));
                 cont = 1;
                 break;
             }
         }
         if(cont == 1){            
-            printf("Nome da peça: %s  |", peca.nomepec);printf("Custo unitário: %.2f  |", peca.custpeca);printf("Frete: %.2f  |", frete);printf("Imposto: %.2f  |", imposto);
-            printf("Lucro: %.2f  |",(peca.vendpeca - (peca2.custpeca + imposto + frete))); printf("Preço de venda: %.2f\n", peca.vendpeca);
-            fwrite(&peca, sizeof(dadopec), 1, notatemp);
+            printf("Nome da peça: %-22s  |", leiturai.nomepec);printf("Custo unitário: %-10.2f  |", leiturai.custpeca);printf("Frete: %-13.2f  |", notafinal.frete);printf("Imposto: %-13.2f  |", notafinal.imposto);
+            printf("Lucro: %-13.2f  |",(leiturai.vendpeca - (leiturai.custpeca + notafinal.imposto + notafinal.frete))); printf("Preço de venda: %.2f\n", leiturai.vendpeca);
+            fwrite(&leiturai, sizeof(dadopec), 1, notatemp);
         }
         else{
-            fwrite(&peca, sizeof(dadopec), 1, notatemp);
+            fwrite(&leiturai, sizeof(dadopec), 1, notatemp);
         }
         
         cont = 0;
     }
-    
-    
-    printf("=====================================\n");
 
-    fclose(nota);
+    fclose(bin);
     fclose(notatemp);
-    fclose(notabin);
-
+    fclose(notafiscal);
+    fclose(lucroarq);
     remove("arquivos/peca.bin");
-    rename("arquivos/temp.bin", "arquivos/peca.bin");
+    rename("arquivos/novapeca.bin", "arquivos/peca.bin");
+
+    free(vetcodpeca);
+    free(vetnpeca);
+
+    return;
 }
 void notafiscaltxt(){
-    char forn[50]; //provisório
-    float frete; //provisório
-    char cnpj[19]; //provisório
-    float imposto; //provisório
-    int quantsup = 0;
-    float precgeral = 0;
-    FILE* nota = fopen("arquivos/notafiscal.bin", "rb");
-    if (nota == NULL){
-        printf("Erro ao abrir o arquivo de nota fiscal!");
-        fclose(nota);
-        return;
-    }
-    FILE* notatxt = fopen("arquivos/peca.txt", "r");
-    if (notatxt == NULL){
-        printf("Erro ao abrir o arquivo de peças!");
-        fclose(nota);
-        fclose(notatxt);
-        return;
-    }
-    FILE* notatemp = fopen("arquivos/temp.txt", "w");
-    if (notatemp == NULL){
-        printf("Erro ao criar o arquivo temporário!");
-        fclose(nota);
-        fclose(notatxt);
-        fclose(notatemp);
-        return;
-    }
     FILE *lucroarq = fopen("arquivos/lucro.bin", "rb");
-    if (lucroarq == NULL){
-        printf("Erro ao abrir o arquivo de lucro!");
-        fclose(nota);
-        fclose(notatxt);
-        fclose(notatemp);
+    if (lucroarq == NULL) {
+        printf("Erro ao carregar o arquivo de lucro das peças\n");
+        return;
+    }
+
+    FILE *notafiscal = fopen("arquivos/notafiscal.txt", "a");
+    if (notafiscal == NULL) {
+        printf("Erro ao carregar o arquivo de notafiscal das peças\n");
         fclose(lucroarq);
         return;
     }
+
+    int *vetnpeca = NULL;
+    int *vetcodpeca = NULL;
+    int tamanho = 0;
+
+    char o = 's';
+    int codBuscapeca;
+    while (o != 'n' && o != 'N') {
+        int npeca;
+
+        FILE *txt = fopen("arquivos/peca.txt", "r");
+        if (txt == NULL) {
+            printf("Erro ao abrir o arquivo para conferir dados atuais\n");
+            fclose(lucroarq);
+            fclose(notafiscal);
+            return;
+        }
+
+        FILE *pecaadd = fopen("arquivos/pecaadd.txt", "w");
+        if (pecaadd == NULL) {
+            printf("Erro ao carregar o arquivo de adição das peças\n");
+            fclose(txt);
+            fclose(lucroarq);
+            fclose(notafiscal);
+            return;
+        }
+
+        printf("Digite o código da peça que deseja registrar a compra: ");
+        scanf("%d", &codBuscapeca);
+
+        rewind(txt);
+        dadopec peca;
+        int encontrado = 0;
+        while (fscanf(txt, "%d, %d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
+                      &peca.codpec, &peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                      &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 10) {
+            if (peca.codpec == codBuscapeca) {
+                encontrado = 1;
+                printf("Insira a quantia de peças de código %d que foram adquiridas:", peca.codpec);
+                scanf("%d", &npeca);
+                peca.npeca += npeca;
+
+                tamanho++;
+                vetcodpeca = (int *)realloc(vetcodpeca, tamanho * sizeof(int));
+                vetnpeca = (int *)realloc(vetnpeca, tamanho * sizeof(int));
+
+                vetcodpeca[tamanho - 1] = codBuscapeca;
+                vetnpeca[tamanho - 1] = npeca;
+            }
+            fprintf(pecaadd, "%d, %d, %s, %s, %s, %s, %.2f, %.2f, %d, %d\n", 
+                    peca.codpec, peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                    peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
+        }
+
+        if (encontrado == 0) {
+            printf("Peça com código %d não encontrada!\n", codBuscapeca);
+        }
+
+        printf("Deseja adicionar outras peças ao estoque?\nAs pecas adicionadas serao registradas na notafiscal desta operacao\n(s/n): ");
+        scanf(" %c", &o);
+
+        fclose(pecaadd);
+        fclose(txt);
+
+        if (encontrado) {
+            remove("arquivos/peca.txt");
+            rename("arquivos/pecaadd.txt", "arquivos/peca.txt");
+            printf("Peças adquiridas com sucesso!\n");
+        } else {
+            remove("arquivos/pecaadd.txt");
+        }
+    }
+
+    FILE *txt = fopen("arquivos/peca.txt", "r");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo para conferir dados atuais\n");
+        fclose(lucroarq);
+        fclose(notafiscal);
+        return;
+    }
+
+    FILE *notatemp = fopen("arquivos/novapeca.txt", "w");
+    if (notatemp == NULL) {
+        fclose(txt);
+        fclose(lucroarq);
+        fclose(notafiscal);
+        return;
+    }
+
     float lucro;
     fread(&lucro, sizeof(float), 1, lucroarq);
-    fclose(lucroarq);
-    dadopec peca;
-    notafisc peca2;
-    
+
+    int quantsup = 0;
+    regfisc notafinal;
+    dadopec leiturai;
+
     getchar();
-    printf("Insira o nome do fornecedor: "); //provisório
-    scanf("%49[^\n]", forn); //provisório
+    printf("codigo da nota: %d");
+    scanf("%d", &notafinal.codnota);
     getchar();
-    printf("Insira o CNPJ do fornecedor: "); //provisório
-    scanf("%19[^\n]", cnpj);    //provisório
+    printf("Insira o nome do fornecedor: ");
+    scanf("%49[^\n]", notafinal.forn);
     getchar();
-    printf("Insira o valor do frete: "); //provisório
-    scanf("%f", &frete);   //provisório
-    printf("Insira o valor do imposto: "); //provisório
-    scanf("%f", &imposto); //provisório
+    printf("Insira o CNPJ do fornecedor: ");
+    scanf("%19[^\n]", notafinal.cnpj);
     getchar();
-    
+    printf("Insira o valor do frete: ");
+    scanf("%f", &notafinal.frete);
+    printf("Insira o valor do imposto: ");
+    scanf("%f", &notafinal.imposto);
+    getchar();
 
     printf("===================================== Nota Fiscal =====================================\n");
-    printf("Fornecedor: %s\n", forn);
-    printf("CNPJ: %s\n", cnpj);
-    printf("Frete: %.2f  |", frete); printf("Imposto: %.2f\n", imposto);
+    printf("Fornecedor: %s\n", notafinal.forn);
+    printf("CNPJ: %s\n", notafinal.cnpj);
+    printf("Frete: %.2f  |", notafinal.frete); printf("Imposto: %.2f\n", notafinal.imposto);
     printf("------------------------------ Produtos ------------------------------\n");
     printf("Nome da peça            | Custo unitário      | Quantidade    | Valor total\n");
-    while (fread(&peca2, sizeof(notafisc), 1, nota)){
-        printf("Nome da peça: %s  |", peca2.nomepec);printf("Custo unitário: %.2f  |", peca2.custpeca);printf("Quantidade: %d  |", peca2.npeca);printf("Valor total: %.2f\n", peca2.custpeca * peca2.npeca);       
-        quantsup += peca2.npeca;
-        precgeral += peca2.custpeca * peca2.npeca;
+    notafinal.precgeral = 0;
+    while (fscanf(txt, "%d, %d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
+                  &leiturai.codpec, &leiturai.definecod, leiturai.nomepec, leiturai.descpec, leiturai.fabpec, leiturai.fornpec, 
+                  &leiturai.custpeca, &leiturai.vendpeca, &leiturai.npeca, &leiturai.minpeca) == 10) {
+        for (int i = 0; i < tamanho; i++) {
+            if (vetcodpeca[i] == leiturai.codpec) {
+                printf("Nome da peça: %-22s  |", leiturai.nomepec); printf("Custo unitário: %-10.2f  |", leiturai.custpeca); printf("Quantidade: %-13d  |", leiturai.npeca); printf("Valor total: %.2f\n", leiturai.custpeca * leiturai.npeca);
+                quantsup += leiturai.npeca;
+                notafinal.precgeral += leiturai.custpeca * leiturai.npeca;
+            }
+        }
     }
-    precgeral += imposto + frete;
-    imposto = imposto/quantsup;
-    frete = frete/quantsup;
+    notafinal.precgeral += notafinal.imposto + notafinal.frete;
+    notafinal.imposto = notafinal.imposto / quantsup;
+    notafinal.frete = notafinal.frete / quantsup;
+    notafinal.definecod = 1;
+    fprintf(notafiscal, "%d, %d, %s, %s, %f, %f, %f", notafinal.codnota, notafinal.definecod, notafinal.forn, notafinal.cnpj, notafinal.imposto, notafinal.frete, notafinal.precgeral);
     printf("------------------------------\n");
-    printf("Valor total da compra: %.2f\n", precgeral);
+    printf("Valor total da compra: %.2f\n", notafinal.precgeral);
     printf("==============================\n");
+    rewind(txt);
     int cont = 0;
-    while(fscanf(notatxt,"%d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
-            &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-            &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9)
-        {
-            rewind(nota);
-        while(fread(&peca2, sizeof(notafisc), 1, nota)){
-                if(peca.codpec == peca2.codpec){
-                peca.vendpeca = peca2.custpeca + imposto + frete;
-                peca.vendpeca = peca.vendpeca + (peca.vendpeca * (lucro/100));
+    while (fscanf(txt, "%d, %d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
+                  &leiturai.codpec, &leiturai.definecod, leiturai.nomepec, leiturai.descpec, leiturai.fabpec, leiturai.fornpec, 
+                  &leiturai.custpeca, &leiturai.vendpeca, &leiturai.npeca, &leiturai.minpeca) == 10) {
+        for (int i = 0; i < tamanho; i++) {
+            if (leiturai.codpec == vetcodpeca[i]) {
+                leiturai.vendpeca = leiturai.custpeca + notafinal.imposto + notafinal.frete;
+                leiturai.vendpeca = leiturai.vendpeca + (leiturai.vendpeca * (lucro / 100));
                 cont = 1;
                 break;
             }
         }
-        if(cont == 1){            
-            printf("Nome da peça: %s  |", peca.nomepec);printf("Custo unitário: %.2f  |", peca.custpeca);printf("Frete: %.2f  |", frete);printf("Imposto: %.2f  |", imposto);
-            printf("Lucro: %.2f  |",(peca.vendpeca - (peca2.custpeca + imposto + frete))); printf("Preço de venda: %.2f\n", peca.vendpeca);
-            fprintf(notatemp,
-                    "%d, %s, %s, %s, %s, %f, %f, %d, %d\n",
-                    peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-                    peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
+        if (cont == 1) {
+            printf("Nome da peça: %-22s  |", leiturai.nomepec); printf("Custo unitário: %-10.2f  |", leiturai.custpeca); printf("Frete: %-13.2f  |", notafinal.frete); printf("Imposto: %-13.2f  |", notafinal.imposto);
+            printf("Lucro: %-13.2f  |", (leiturai.vendpeca - (leiturai.custpeca + notafinal.imposto + notafinal.frete))); printf("Preço de venda: %.2f\n", leiturai.vendpeca);
+            fprintf(notatemp, "%d, %d, %s, %s, %s, %s, %.2f, %.2f, %d, %d\n", 
+                    leiturai.codpec, leiturai.definecod, leiturai.nomepec, leiturai.descpec, leiturai.fabpec, leiturai.fornpec, 
+                    leiturai.custpeca, leiturai.vendpeca, leiturai.npeca, leiturai.minpeca);
+        } else {
+            fprintf(notatemp, "%d, %d, %s, %s, %s, %s, %.2f, %.2f, %d, %d\n", 
+                    leiturai.codpec, leiturai.definecod, leiturai.nomepec, leiturai.descpec, leiturai.fabpec, leiturai.fornpec, 
+                    leiturai.custpeca, leiturai.vendpeca, leiturai.npeca, leiturai.minpeca);
         }
-        else{
-            fprintf(notatemp,
-                    "%d, %s, %s, %s, %s, %f, %f, %d, %d\n",
-                    peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-                    peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
-        }
-        
         cont = 0;
     }
-    
-    printf("=====================================\n");
 
-    fclose(nota);
+    fclose(txt);
     fclose(notatemp);
-    fclose(notatxt);
-
+    fclose(notafiscal);
+    fclose(lucroarq);
     remove("arquivos/peca.txt");
-    rename("arquivos/temp.txt", "arquivos/peca.txt");
+    rename("arquivos/novapeca.txt", "arquivos/peca.txt");
+
+    free(vetcodpeca);
+    free(vetnpeca);
+
+    return;
+}
+void notafiscal(){
+    int formatoReg;
+    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    if (formatoArq == NULL){
+        printf("Erro na interpretação do formato do arquivo!");
+        return;
+    }
+    fread(&formatoReg, sizeof(int), 1, formatoArq);
+
+    //separa entre os formatos definidos no arquivo de formato
+    if (formatoReg == 1){
+        notafiscalbin();
+    }
+    else{
+        notafiscaltxt();
+    }
+
+    fclose(formatoArq);
 }
 
 //Subrotina para edição de peças em binário
@@ -761,8 +798,8 @@ void editpecatxt(){
 
     //função que separa o arquivo localizado para edição
     while (fscanf(txt, 
-                "%d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
-                &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                "%d, %d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
+                &peca.codpec, &peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
                 &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9) {
         if (peca.codpec == codBusca) {
             encontrado = 1;
@@ -793,8 +830,8 @@ void editpecatxt(){
 
             // Salvar peça atualizada no arquivo temporário
             fprintf(temp,
-                    "%d, %s, %s, %s, %s, %f, %f, %d, %d\n",
-                    peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                    "%d, %d, %s, %s, %s, %s, %f, %f, %d, %d\n",
+                    peca.codpec, peca.definecod,peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
                     peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
         }
     }
@@ -873,9 +910,9 @@ void lerpecatxt(){
 
     //função de leitura do arquivo
     printf("===================================== Lista de Peças =====================================\n");
-    while (fscanf(txt, "%d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
-                   &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-                   &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9) {
+    while (fscanf(txt, "%d, %d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
+                   &peca.codpec, &peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                   &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 10) {
         if(peca.npeca < peca.minpeca){
             printf("Código da peça: %d\n", peca.codpec);
             printf("Nome da peça: %s\n", peca.nomepec);
@@ -927,6 +964,52 @@ void lerpeca(){
 
 
 //Subrotina para remover dados em binário
+void removerpecabin(){
+    int codBusca;
+    printf("Digite o código da peça que deseja remover: ");
+    scanf("%d", &codBusca);
+
+    FILE *bin = fopen("arquivos/peca.bin", "rb");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo binário para leitura!\n");
+        fclose(bin);
+        return;
+    }
+
+    FILE *temp = fopen("arquivos/temp.bin", "wb");
+    if (temp == NULL) {
+        printf("Erro ao criar arquivo temporário!\n");
+        fclose(bin);
+        fclose(temp);
+        return;
+    }
+
+
+    dadopec peca;
+    int encontrado = 0;
+
+    // Lendo os dados da peça do arquivo binário
+    while (fread(&peca, sizeof(dadopec), 1, bin)) {
+        if (peca.codpec == codBusca) {
+            encontrado = 1;
+            peca.definecod = 1;
+        }
+        fwrite(&peca, sizeof(dadopec), 1, temp);
+    }
+
+    fclose(bin);
+    fclose(temp);
+
+    if (encontrado) {
+        remove("arquivos/peca.bin");
+        rename("arquivos/temp.bin", "arquivos/peca.bin");
+        printf("Peça removida com sucesso!\n");
+    } else {
+        remove("arquivos/temp.bin");
+        printf("Peça com código %d não encontrada!\n", codBusca);
+    }
+}
+//SUbrotina para remover dados em texto
 void removerpecatxt(){
     int codBusca;
     printf("Digite o código da peça que deseja remover: ");
@@ -950,19 +1033,17 @@ void removerpecatxt(){
 
     //Lê os dados a serem removidos
     while (fscanf(txt, 
-                  "%d\n%19[^\n]\n%59[^\n]\n%29[^\n]\n%29[^\n]\n%f\n%f\n%d\n%d\n", 
-                  &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-                  &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9) {
+                  "%d,%d,%19[^,],%59[^,],%29[^,],%29[^,],%f,%f,%d,%d\n", 
+                  &peca.codpec, &peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                  &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 10) {
         if (peca.codpec == codBusca) {
             encontrado = 1;
-            //Deixa o novo registro vazio
-        } else {
-            // Copiar peça não removida para o arquivo temporário
-            fprintf(temp,
-                    "%d\n%s\n%s\n%s\n%s\n%f\n%f\n%d\n%d\n",
-                    peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-                    peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
+            peca.definecod = 1;
+            
         }
+        fprintf(temp, "%d,%d,%s,%s,%s,%s,%f,%f,%d,%d\n",
+                peca.codpec, peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
     }
 
     fclose(txt);
@@ -974,51 +1055,6 @@ void removerpecatxt(){
         printf("Peça removida com sucesso!\n");
     } else {
         remove("arquivos/temp.txt");
-        printf("Peça com código %d não encontrada!\n", codBusca);
-    }
-}
-//SUbrotina para remover dados em texto
-void removerpecabin(){
-    int codBusca;
-    printf("Digite o código da peça que deseja remover: ");
-    scanf("%d", &codBusca);
-
-    FILE *bin = fopen("arquivos/peca.bin", "rb");
-    if (bin == NULL) {
-        printf("Erro ao abrir o arquivo binário para leitura!\n");
-        return;
-    }
-
-    FILE *temp = fopen("arquivos/temp.bin", "wb");
-    if (temp == NULL) {
-        printf("Erro ao criar arquivo temporário!\n");
-        fclose(bin);
-        return;
-    }
-
-    dadopec peca;
-    int encontrado = 0;
-
-    // Lendo os dados da peça do arquivo binário
-    while (fread(&peca, sizeof(dadopec), 1, bin)) {
-        if (peca.codpec == codBusca) {
-            encontrado = 1;
-            // Não escreve o registro no arquivo temporário, efetivamente removendo-o
-        } else {
-            // Copiar peça não removida para o arquivo temporário
-            fwrite(&peca, sizeof(dadopec), 1, temp);
-        }
-    }
-
-    fclose(bin);
-    fclose(temp);
-
-    if (encontrado) {
-        remove("arquivos/peca.bin");
-        rename("arquivos/temp.bin", "arquivos/peca.bin");
-        printf("Peça removida com sucesso!\n");
-    } else {
-        remove("arquivos/temp.bin");
         printf("Peça com código %d não encontrada!\n", codBusca);
     }
 }
@@ -1041,6 +1077,121 @@ void removerpeca(){
 
     fclose(formatoArq);
 }
+
+
+void restaurapecabin(){
+    int codBusca;
+    printf("Digite o código da peça que deseja restaurar: ");
+    scanf("%d", &codBusca);
+
+    FILE *bin = fopen("arquivos/peca.bin", "rb");
+    if (bin == NULL) {
+        printf("Erro ao abrir o arquivo binário para leitura!\n");
+        fclose(bin);
+        return;
+    }
+
+    FILE *temp = fopen("arquivos/temp.bin", "wb");
+    if (temp == NULL) {
+        printf("Erro ao criar arquivo temporário!\n");
+        fclose(bin);
+        fclose(temp);
+        return;
+    }
+
+    dadopec peca;
+    int encontrado = 0;
+
+    // Lendo os dados da peça do arquivo binário
+    while (fread(&peca, sizeof(dadopec), 1, bin)) {
+        if (peca.codpec == codBusca) {
+            encontrado = 1;
+            peca.definecod = 0;
+        } 
+        fwrite(&peca, sizeof(dadopec), 1, temp);
+    }
+
+    fclose(bin);
+    fclose(temp);
+
+    if (encontrado) {
+        remove("arquivos/peca.bin");
+        rename("arquivos/temp.bin", "arquivos/peca.bin");
+        printf("Peça removida com sucesso!\n");
+    } else {
+        remove("arquivos/temp.bin");
+        printf("Peça com código %d não encontrada!\n", codBusca);
+    }
+} 
+void restaurapecatxt(){
+    int codBusca;
+    printf("Digite o código da peça que deseja restaurar: ");
+    scanf("%d", &codBusca);
+
+    FILE *txt = fopen("arquivos/peca.txt", "r");
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo texto para leitura!\n");
+        fclose(txt);
+        return;
+    }
+
+    FILE *temp = fopen("arquivos/temp.txt", "w");
+    if (temp == NULL) {
+        printf("Erro ao criar arquivo temporário!\n");
+        fclose(txt);
+        fclose(temp);
+        return;
+    }
+
+    dadopec peca;
+    int encontrado = 0;
+
+    while (fscanf(txt, 
+            "%d,%d,%19[^,],%59[^,],%29[^,],%29[^,],%f,%f,%d,%d\n", 
+            &peca.codpec, &peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+            &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 10) {
+
+        if (peca.codpec == codBusca) {
+            encontrado = 1;
+            peca.definecod = 0;
+        } 
+        fprintf(temp, "%d,%d,%s,%s,%s,%s,%f,%f,%d,%d\n",
+                peca.codpec, peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
+    }
+
+    fclose(txt);
+    fclose(temp);
+
+    if (encontrado) {
+        remove("arquivos/peca.txt");
+        rename("arquivos/temp.txt", "arquivos/peca.txt");
+        printf("Peça removida com sucesso!\n");
+    } else {
+        remove("arquivos/temp.txt");
+        printf("Peça com código %d não encontrada!\n", codBusca);
+    }
+}
+void restaurapeca(){
+    int formatoReg;
+    FILE *formatoArq = fopen("arquivos/formato.bin", "rb");
+    if (formatoArq == NULL){
+        printf("Erro na interpretação do formato do arquivo!");
+        return;
+    }
+    fread(&formatoReg, sizeof(int), 1, formatoArq);
+
+    if (formatoReg == 1){
+        restaurapecabin();
+    }
+    else{
+        restaurapecatxt();
+    }
+
+    fclose(formatoArq);
+}
+
+
 
 void detectapecabin(){
     int nmin = 0;
@@ -1078,8 +1229,8 @@ void detectapecatxt(){
             }
     dadopec peca;
     while (fscanf(txt, 
-        "%d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
-        &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+        "%d, %d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
+        &peca.codpec, &peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
         &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9) 
     {
         if(peca.npeca < peca.minpeca){

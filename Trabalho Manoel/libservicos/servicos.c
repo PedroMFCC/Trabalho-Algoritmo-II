@@ -64,7 +64,7 @@ void regservico() {
     scanf(" %c", &sn);
     getchar();
     if(sn == 's'|| sn == 'S'){
-        printf("Insira o código referente a peça desejada");
+        printf("Insira o código referente a peça desejada: ");
         scanf("%d", &servico.peca);
         getchar();
     }
@@ -270,7 +270,7 @@ void lerservicobin() {
         }
         else{printf("erro ao definir codigo de peca\n");}
         
-        printf("--------------------------------------------------------------------------------------\n");
+        printf("\n--------------------------------------------------------------------------------------\n");
     }
     
     fclose(bin);
@@ -285,7 +285,7 @@ void lerservicotxt() {
     }
 
     printf("================================== Lista de Serviços ==================================\n");
-    while(fscanf(arquivo, "%d, %99[^,], %f, %f, %d\n", &servico.codigo, servico.descricao, &servico.preco, &servico.comissao, &servico.tempo, &servico.peca) == 6){
+    while(fscanf(arquivo, "%d, %99[^,], %f, %f, %d, %d\n", &servico.codigo, servico.descricao, &servico.preco, &servico.comissao, &servico.tempo, &servico.peca) == 6){
         if(servico.peca == 0){
             printf("Código: %d\nDescrição: %s\nPreço: %.2f\nComissão: %.2f\nTempo gasto: %d", 
                servico.codigo, servico.descricao, servico.preco, servico.tempo, servico.comissao);
@@ -296,7 +296,7 @@ void lerservicotxt() {
         }
         else{printf("erro ao definir codigo de peca\n");}
         
-        printf("--------------------------------------------------------------------------------------\n");
+        printf("\n--------------------------------------------------------------------------------------\n");
     }    
 
     fclose(arquivo);

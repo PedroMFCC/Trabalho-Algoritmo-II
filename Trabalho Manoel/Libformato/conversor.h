@@ -3,6 +3,7 @@
 
 typedef struct{
     int codpec;
+    int definecod;
     char nomepec[20];    
     char descpec[60];
     char fabpec[30];

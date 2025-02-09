@@ -2,6 +2,7 @@
 #define VEICULOS_H
 
 typedef struct {
+    int idveiculo;
     char placa[10];
     char modelo[50];
     char marca[50];

@@ -44,9 +44,9 @@ void pecabin(){
     }
 
 
-    while (fscanf(txt, "%d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
-                   &peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
-                   &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 9) 
+    while (fscanf(txt, "%d, %d, %19[^,], %59[^,], %29[^,], %29[^,], %f, %f, %d, %d\n", 
+                   &peca.codpec, &peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, 
+                   &peca.custpeca, &peca.vendpeca, &peca.npeca, &peca.minpeca) == 10) 
     {                    
     fwrite(&peca, sizeof(dadopecC), 1, bin);
     }
@@ -228,8 +228,8 @@ void pecatxt(){
     
     while (fread(&peca, sizeof(dadopecC), 1, bin)) {
         fprintf(txt,
-        "%d, %s, %s, %s, %s, %f, %f, %d, %d\n",
-        peca.codpec, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
+        "%d, %d, %s, %s, %s, %s, %f, %f, %d, %d\n",
+        peca.codpec, peca.definecod, peca.nomepec, peca.descpec, peca.fabpec, peca.fornpec, peca.custpeca, peca.vendpeca, peca.npeca, peca.minpeca);
     }
 
     fclose(txt);
