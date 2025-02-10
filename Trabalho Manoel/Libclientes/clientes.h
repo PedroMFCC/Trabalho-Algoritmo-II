@@ -2,6 +2,7 @@
 #define CLIENTES_H
 
 typedef struct {
+    int id;
     char nome[50];
     char cpfCnpj[20];
     char endereco[100];
@@ -23,7 +24,6 @@ void editcli();
 void lercli();
 void menucliente();
 
-void excluirRegistro();
 void excluirCliente();
 
 #endif

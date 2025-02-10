@@ -3,37 +3,13 @@
 #include "clientes.h"
 
 
-
-
-void regcliTXT(cliDados cliente) {
-
-    FILE *txt = fopen("arquivos/clientes.txt", "a"); // Abre o arquivo em texto
-    if (txt == NULL) {
-        printf("Erro ao abrir o arquivo!!\n");
-        return;
-    }
-    
-    fprintf(txt, "%s, %s, %s, %s, %s\n",
-    cliente.nome, cliente.cpfCnpj, cliente.endereco, cliente.telefone, cliente.email);
-
-    fclose(txt);
-    printf("Cliente registrado com sucesso!");
-    
-} 
-void regcliBIN(cliDados cliente ) {
-  
-    FILE *bin = fopen("arquivos/clientes.bin", "ab"); 
-    if (bin == NULL) {
-        perror("Erro ao abrir o arquivo!!");
-        return;
-}
-    fwrite(&cliente, sizeof(cliDados), 1, bin);
-    fclose(bin);
-    
-}
 void regcli() {
     cliDados cliente;
 
+getchar();
+
+printf("Insira o id do cliente: ");
+scanf("%d", &cliente.id);
 getchar();
 printf("Insira o nome: ");
 fgets(cliente.nome, sizeof(cliente.nome), stdin);
@@ -77,6 +53,39 @@ case 2:
 fclose(formaArqv);
 }
 
+void editcli() {
+    int formaReg;
+
+    FILE *formaArqv = fopen("arquivos/formato.bin", "rb");
+    if (formaArqv == NULL) {
+        printf("Erro no formato do arquivo escolhido!");
+        return;
+    }
+    fread(&formaReg, sizeof(int), 1, formaArqv);
+
+    switch (formaReg)
+    {
+    case 1:
+        editcliBIN();
+        break;
+    
+    case 2:
+        editcliTXT();
+        break;
+    }
+}
+
+void regcliBIN(cliDados cliente ) {
+  
+    FILE *bin = fopen("arquivos/clientes.bin", "ab"); 
+    if (bin == NULL) {
+        perror("Erro ao abrir o arquivo!!");
+        return;
+}
+    fwrite(&cliente, sizeof(cliDados), 1, bin);
+    fclose(bin);
+    
+}
 
 void lercliBIN() {
     cliDados clientes;
@@ -89,6 +98,7 @@ void lercliBIN() {
 
     printf("================================== Lista de Clientes ==================================\n");
     while (fread(&clientes, sizeof(cliDados), 1, bin)) {
+        printf("ID: %d\n", clientes.id);
         printf("Nome: %s\n", clientes.nome);
         printf("CPF/CNPJ: %s\n", clientes.cpfCnpj);
         printf("Endereço: %s\n", clientes.endereco);
@@ -98,59 +108,7 @@ void lercliBIN() {
     }
     fclose(bin);
 }
-void lercliTXT() {
-    cliDados clientes;
-    char linha[256];
-    
-    FILE *txt = fopen("arquivos/clientes.txt", "r");
-    if (txt == NULL) {
-        printf("Nenhum cliente registrado ainda!!\n");
-        return;
-    }
-
-    printf("================================== Lista de Clientes ==================================\n");
-    while (fgets(linha, sizeof(linha), txt)) {
-        if (sscanf(linha, "%49[^,], %19[^,], %99[^,], %19[^,], %49[^\n]", 
-                   clientes.nome, 
-                   clientes.cpfCnpj, 
-                   clientes.endereco, 
-                   clientes.telefone, 
-                   clientes.email) == 5) {
-            printf("Nome: %s\n", clientes.nome);
-            printf("CPF/CNPJ: %s\n", clientes.cpfCnpj);
-            printf("Endereço: %s\n", clientes.endereco);
-            printf("Telefone: %s\n", clientes.telefone);
-            printf("Email: %s\n", clientes.email);
-            printf("--------------------------------------------------------------------------------------\n");
-        } else {
-            printf("Erro ao processar linha: %s\n", linha);
-        }
-    }
-    fclose(txt);
-}
-void lercli() {
-    int formaReg;
-    FILE *formaArqv = fopen("arquivos/formato.bin", "rb");
-    if (formaArqv == NULL) {
-        printf("Erro ao ler o arquivo!!");
-        return;
-    }
-    fread(&formaReg, sizeof(int), 1, formaArqv);
-    switch (formaReg)
-    {
-    case 1:
-        lercliBIN();
-        break;
-    
-    case 2:
-        lercliTXT();
-        break;
-    }
-
-    fclose(formaArqv);
-}
-
-
+/* vai editar os cliente em binario e localizar o fornecedor atraves do cpf ou cnpj*/ 
 void editcliBIN() {
     char cpfCnpjBusca[20];
 
@@ -207,6 +165,55 @@ void editcliBIN() {
 
     fclose(arquivo);
 }
+// registro dos clientes em texto---------------------------------------------------------------------------
+void regcliTXT(cliDados cliente) {
+
+    FILE *txt = fopen("arquivos/clientes.txt", "a"); // Abre o arquivo em texto
+    if (txt == NULL) {
+        printf("Erro ao abrir o arquivo!!\n");
+        return;
+    }
+    
+    fprintf(txt, "%d,%s,%s,%s,%s,%s\n",
+    cliente.id, cliente.nome, cliente.cpfCnpj, cliente.endereco, cliente.telefone, cliente.email);
+
+    fclose(txt);
+    printf("Cliente registrado com sucesso!");
+    
+} 
+void lercliTXT() {
+    cliDados clientes;
+    char linha[256];
+    
+    FILE *txt = fopen("arquivos/clientes.txt", "r");
+    if (txt == NULL) {
+        printf("Nenhum cliente registrado ainda!!\n");
+        return;
+    }
+
+    printf("================================== Lista de Clientes ==================================\n");
+    while (fgets(linha, sizeof(linha), txt)) {
+        if (sscanf(linha, "%d,%[^,],%[^,],%[^,],%[^,],%[^\n]", 
+                   &clientes.id,
+                   clientes.nome, 
+                   clientes.cpfCnpj, 
+                   clientes.endereco, 
+                   clientes.telefone, 
+                   clientes.email) == 6) {
+            printf("ID: %d\n", clientes.id);
+            printf("Nome: %s\n", clientes.nome);
+            printf("CPF/CNPJ: %s\n", clientes.cpfCnpj);
+            printf("Endereço: %s\n", clientes.endereco);
+            printf("Telefone: %s\n", clientes.telefone);
+            printf("Email: %s\n", clientes.email);
+            printf("--------------------------------------------------------------------------------------\n");
+        } else {
+            printf("Erro ao processar linha: %s\n", linha);
+        }
+    }
+    fclose(txt);
+}
+/* vai editar os clientes em texto e localizar o cliente atraves do cpf ou cnpj*/
 void editcliTXT() {
     char cpfCnpjBusca[20];
 
@@ -233,11 +240,14 @@ void editcliTXT() {
 
     while (fgets(linha, sizeof(linha), txt)) {
         
-        if (sscanf(linha, "%49[^,], %19[^,], %99[^,], %19[^,], %49[^\n]\n", c.nome, c.cpfCnpj, c.endereco, c.telefone, c.email) == 5) {
+        if (sscanf(linha, "%d,%[^,],%[^,],%[^,],%[^,],%[^\n]", c.id,c.nome, c.cpfCnpj, c.endereco, c.telefone, c.email) == 6) {
             if (strcmp(c.cpfCnpj, cpfCnpjBusca) == 0) {
                 encontrado = 1;
                 printf("Cliente encontrado: %s\n", c.nome);
                 printf("Insira os novos dados do cliente:\n");
+
+                printf("Novo id: ");
+                scanf("%d", &c.id);
 
                 printf("Novo nome: ");
                 fgets(c.nome, sizeof(c.nome), stdin);
@@ -255,7 +265,7 @@ void editcliTXT() {
                 fgets(c.email, sizeof(c.email), stdin);
                 c.email[strcspn(c.email, "\n")] = '\0';
 
-                fprintf(temp, "%s, %s, %s, %s, %s\n", c.nome, c.cpfCnpj, c.endereco, c.telefone, c.email);
+                fprintf(temp, "%d,%s,%s,%s,%s,%s\n", c.id,c.nome, c.cpfCnpj, c.endereco, c.telefone, c.email);
             } else {
                 // vai copair os dados originais para o arquivo temporario
                 fprintf(temp, "%s", linha);
@@ -278,71 +288,27 @@ void editcliTXT() {
         printf("Cliente com CPF/CNPJ %s não encontrado.\n", cpfCnpjBusca);
     }
 }
-void editcli() {
-    int formaReg;
 
+void lercli() {
+    int formaReg;
     FILE *formaArqv = fopen("arquivos/formato.bin", "rb");
     if (formaArqv == NULL) {
-        printf("Erro no formato do arquivo escolhido!");
+        printf("Erro ao ler o arquivo!!");
         return;
     }
     fread(&formaReg, sizeof(int), 1, formaArqv);
-
     switch (formaReg)
     {
     case 1:
-        editcliBIN();
+        lercliBIN();
         break;
     
     case 2:
-        editcliTXT();
+        lercliTXT();
         break;
     }
-}
 
-
-void excluirRegistro() {
-    int formato; 
-    char confirmacao;
-
-    FILE *formatoFile = fopen("arquivos/formato.bin", "rb");
-    if (formatoFile == NULL) {
-        printf("Erro ao abrir o arquivo de formato. Certifique-se de que ele existe!\n");
-        return;
-    }
-    fread(&formato, sizeof(int), 1, formatoFile);
-    fclose(formatoFile);
-
-    if (formato == 1) {
-        printf("Você selecionou o formato binário. Deseja excluir o arquivo de registro BIN? (S/N): ");
-    } else if (formato == 2) {
-        printf("Você selecionou o formato texto. Deseja excluir o arquivo de registro TXT? (S/N): ");
-    } else {
-        printf("Formato de registro inválido no arquivo de configuração.\n");
-        return;
-    }
-
-    scanf(" %c", &confirmacao);
-    while (getchar() != '\n'); 
-
-    if (confirmacao != 'S' && confirmacao != 's') {
-        printf("Exclusão cancelada.\n");
-        return;
-    }
-
-    if (formato == 1) {
-        if (remove("arquivos/clientes.bin") == 0) {
-            printf("Arquivo BIN de registro excluído com sucesso!\n");
-        } else {
-            printf("Erro ao excluir o arquivo BIN de registro. Verifique se ele existe.\n");
-        }
-    } else if (formato == 2) {
-        if (remove("arquivos/clientes.txt") == 0) {
-            printf("Arquivo TXT de registro excluído com sucesso!\n");
-        } else {
-            printf("Erro ao excluir o arquivo TXT de registro. Verifique se ele existe.\n");
-        }
-    }
+    fclose(formaArqv);
 }
 
 void excluirCliente() {
