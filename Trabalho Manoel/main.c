@@ -116,10 +116,10 @@ void menupecas(){
 
     printf("\n======================================== MENU PEÇAS ========================================\n");
     if(nmin < 1){
-        printf("opções:\n 1 - Registrar nova peça\n 2 - Editar peca ja registrada\n 3 - Consultar o arquivo\n 4 - Remover registro\n 5 - Manusear estoque\n 6 - Cancelar\n digite a opção:");
+        printf("opções:\n 1 - Registrar nova peça\n 2 - Editar peca ja registrada\n 3 - Consultar o arquivo\n 4 - Remover registro\n 5 - Manusear estoque\n 6 - Relatorio de pecas\n 7 - Cancelar\n digite a opção:");
     }
     else{
-        printf("(!)* - Estoque em falta!\n\nopções:\n 1 - Registrar nova peça\n 2 - Editar peca ja registrada\n 3 - Consultar o arquivo\n 4 - Remover registro\n 5 - Manusear estoque(!)\n 6 - Cancelar\n digite a opção:");
+        printf("(!)* - Estoque em falta!\n\nopções:\n 1 - Registrar nova peça\n 2 - Editar peca ja registrada\n 3 - Consultar o arquivo\n 4 - Remover registro\n 5 - Manusear estoque(!)\n 6 - Relatorio de pecas\n 7 - Cancelar\n digite a opção:");
     }
     scanf("%d", &i);
 
@@ -146,6 +146,10 @@ void menupecas(){
             break;
 
             case 6:
+                relatoriopeca();
+            break;
+
+            case 7:
                 printf("\n\noperacao cancelada!");
                 printf("\n================================================================================\n");
                 return;

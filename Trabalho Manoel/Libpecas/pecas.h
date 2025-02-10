@@ -46,13 +46,42 @@ void rempecastxt();
 void rempecas();
 
 void gerenciarpecasmen();
+void reallocnotafisc(dadopec **dadonota, int *tamanho, dadopec novaPeca);
 
 void notafiscaltxt();
 void notafiscalbin();
+void notafiscal();
 
 void lerpecabin();
 void lerpecatxt();
 void lerpeca();
+
+void lernotafiscbin();
+void lernotafisctxt();
+void lernotafisc();
+
+void excluinotafiscalbin();
+void excluinotafiscaltxt();
+void excluinotafiscal();
+
+
+void restauranotaficbin();
+void restauranotafictxt();
+void restauranotafic();
+
+void pecapornometxt();
+void pecapornomebin();
+void pecapornome();
+
+void riscopecatxt();
+void riscopecabin();
+void riscopeca();
+
+
+void pecaporcodbin();
+void pecaporcodtxt();
+void pecaporcod();
+
 
 void removerpecabin();
 void removerpecatxt();
@@ -62,8 +91,11 @@ void restaurapecabin();
 void restaurapecatxt();
 void restaurapeca();
 
+
 void detectapecabin();
 void detectapecatxt();
 void detectapeca(); 
+
+void relatoriopeca();
 
 #endif
