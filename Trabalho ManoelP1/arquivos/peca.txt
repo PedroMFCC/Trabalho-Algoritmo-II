@@ -1,0 +1,2 @@
+1, Oleo, Oleo Shell Premium, Shell LTDA, Shell LTDA Transporte, 340.00, 406.95, 14, 10
+2, Pneu, Pneu Michelin, Michelin LTDA, Michelin LTDA Transporte, 1230.00, 1430.45, 16, 12

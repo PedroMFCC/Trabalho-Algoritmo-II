@@ -1,0 +1,2 @@
+1,Shell,Shell Brasil Petroleo LTDA,001699324.00-92,10.456.016/0013-09,Rua Ponte Alta,(11) 3292-5058,pedro.souza@shell.com
+2,Michelin,Sociedade Michelin de Participacoes Indust e Comercio LTDA,048722300.05-49,50.567.288/0026-07,Avenida Monteiro Lobato,(21) 3621-4711,juridico@michelin.com

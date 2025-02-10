@@ -1,0 +1,2 @@
+1,1,1,2,Pneu Michelin,2,1600.00
+2,2,2,1,Oleo Shell Premium,1,560.00
