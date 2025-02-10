@@ -42,6 +42,47 @@
         "problemMatcher": []
       },
       {
+        "label": "Compilar controle",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/libfinanceiro/controleC.c",
+          "-o", "${workspaceFolder}/libfinanceiro/controle.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Compilar contasApagar",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/libfinanceiro/contasApagar.c",
+          "-o", "${workspaceFolder}/libfinanceiro/contasApagar.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Compilar contasAreceber",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/libfinanceiro/contasAreceber.c",
+          "-o", "${workspaceFolder}/libfinanceiro/contasAreceber.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Compilar relfinanceiro",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/librelatorios/relfinanceiro.c",
+          "-I", "${workspaceFolder}/libfinanceiro",
+          "-o", "${workspaceFolder}/librelatorios/relfinanceiro.o"
+        ],
+        "problemMatcher": []
+      },
+      {
         "label": "Compilar e Linkar programa",
         "type": "shell",
         "command": "gcc",
@@ -55,6 +96,12 @@
           "${workspaceFolder}/Libfornecedor/fornecedor.o", 
 		      "${workspaceFolder}/libfuncionarios/funcionarios.o",
           "${workspaceFolder}/libformato/conversor.o",
+          "${workspaceFolder}/libfinanceiro/contasApagar.o",
+				  "${workspaceFolder}/libfinanceiro/controle.o",
+				  "${workspaceFolder}/libfinanceiro/contasAreceber.o",
+				  "${workspaceFolder}/librelatorios/relcadastros.o",
+				  "${workspaceFolder}/librelatorios/relfinanceiro.o",
+          "${workspaceFolder}/LibAgendamento/agendamento.o",
           "-o", "${workspaceFolder}/programa.exe"
         ],
         "group": {
@@ -70,6 +117,16 @@
         "args": [
           "-c", "${workspaceFolder}/libfuncionarios/funcionarios.c",
           "-o", "${workspaceFolder}/libfuncionarios/funcionarios.o"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "compilar Agendamento ",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+          "-c", "${workspaceFolder}/LibAgendamento/agendamento.c",
+          "-o", "${workspaceFolder}/LibAgendamento/agendamento.o"
         ],
         "problemMatcher": []
       },
